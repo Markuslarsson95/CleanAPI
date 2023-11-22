@@ -1,4 +1,7 @@
 using Application;
+using Application.Dtos;
+using Domain.Models;
+using FluentValidation;
 using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
