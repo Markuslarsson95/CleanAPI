@@ -1,6 +1,7 @@
 ﻿using Application.Commands.Dogs;
 using Application.Dtos;
-using Domain.Models;
+using Application.Queries.Dogs;
+using Application.Queries.Dogs.GetAll;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -9,6 +10,7 @@ namespace Test.DogTests.CommandTests
     public class AddDogTests
     {
         private AddDogCommandHandler _handler;
+        private GetAllDogsQueryHandler _allDogsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -17,78 +19,25 @@ namespace Test.DogTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new AddDogCommandHandler(_mockDatabase);
+            _allDogsHandler = new GetAllDogsQueryHandler(_mockDatabase);
         }
 
         [Test]
-        public async Task Handle_NewValidDog_ReturnsNewDog()
+        public async Task AddHandle_AddNewValidDog_ReturnsNewDog()
         {
             // Arrange
-            Dog newDog = new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "testName"
-            };
-
-            DogDto newDogDto = new(){ Name = newDog.Name};
-            var query = new AddDogCommand(newDogDto);
+            var newDogDto = new DogDto { Name = "testName" };
+            var addDogCommand = new AddDogCommand(newDogDto);
 
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var addedDog = await _handler.Handle(addDogCommand, CancellationToken.None);
+
+            var getAllDogsQuery = new GetAllDogsQuery();
+            var allDogs = await _allDogsHandler.Handle(getAllDogsQuery, CancellationToken.None);
 
             // Assert
-            Assert.That(result, Is.EqualTo(newDog));
+            Assert.NotNull(addedDog);
+            Assert.Contains(addedDog, allDogs);
         }
     }
 }
-
-//using Application.Queries.Dogs.GetById;
-//using Infrastructure.Database;
-
-//namespace Test.DogTests.QueryTest
-//{
-//    [TestFixture]
-//    public class GetDogByIdTests
-//    {
-//        private GetDogByIdQueryHandler _handler;
-//        private MockDatabase _mockDatabase;
-
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            // Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _handler = new GetDogByIdQueryHandler(_mockDatabase);
-//        }
-
-//        [Test]
-//        public async Task Handle_ValidId_ReturnsCorrectDog()
-//        {
-//            // Arrange
-//            var dogId = new Guid("12345678-1234-5678-1234-567812345678");
-
-//            var query = new GetDogByIdQuery(dogId);
-
-//            // Act
-//            var result = await _handler.Handle(query, CancellationToken.None);
-
-//            // Assert
-//            Assert.NotNull(result);
-//            Assert.That(result.Id, Is.EqualTo(dogId));
-//        }
-
-//        [Test]
-//        public async Task Handle_InvalidId_ReturnsNull()
-//        {
-//            // Arrange
-//            var invalidDogId = Guid.NewGuid();
-
-//            var query = new GetDogByIdQuery(invalidDogId);
-
-//            // Act
-//            var result = await _handler.Handle(query, CancellationToken.None);
-
-//            // Assert
-//            Assert.IsNull(result);
-//        }
-//    }
-//}

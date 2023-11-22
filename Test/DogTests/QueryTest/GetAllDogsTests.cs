@@ -34,26 +34,5 @@ namespace Test.DogTests.QueryTest
             Assert.NotNull(result);
             Assert.That(result, Is.EqualTo(dogs));
         }
-
-        //[Test]
-        //public async Task Handle_InvalidList_ReturnsNotEqual()
-        //{
-        //    // Arrange
-        //    List<Dog> dogs = _mockDatabase.Dogs;
-
-        //    var query = new GetAllDogsQuery();
-
-        //    // Act
-        //    var result = await _handler.Handle(query, CancellationToken.None);
-
-        //    dogs.Add(new Dog
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = "Test-Fail",
-        //    });
-
-        //    // Assert
-        //    Assert.That(result, Is.Not.EqualTo(dogs));
-        //}
     }
 }
