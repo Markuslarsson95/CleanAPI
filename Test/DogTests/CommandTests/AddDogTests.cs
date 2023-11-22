@@ -23,10 +23,10 @@ namespace Test.DogTests.CommandTests
         }
 
         [Test]
-        public async Task AddHandle_AddNewValidDog_ReturnsNewDog()
+        public async Task Handle_AddNewValidDog_ReturnsNewDog()
         {
             // Arrange
-            var newDogDto = new DogDto { Name = "testName" };
+            var newDogDto = new DogDto { Name = "testNameDog" };
             var addDogCommand = new AddDogCommand(newDogDto);
 
             // Act
