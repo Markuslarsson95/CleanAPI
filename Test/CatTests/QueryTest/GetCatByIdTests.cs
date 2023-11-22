@@ -1,7 +1,7 @@
 ﻿using Application.Queries.Cats.GetById;
 using Infrastructure.Database;
 
-namespace Test.DogTests.QueryTest
+namespace Test.CatTests.QueryTest
 {
     [TestFixture]
     public class GetCatByIdTests
