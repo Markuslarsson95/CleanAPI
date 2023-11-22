@@ -46,7 +46,10 @@ namespace API.Controllers.CatController
         [Route("addNewCat")]
         public async Task<IActionResult> AddCat([FromBody] CatDto newCat)
         {
-            return Ok(await _mediator.Send(new AddCatCommand(newCat)));
+            var response = await _mediator.Send(new AddCatCommand(newCat));
+
+            return Ok(response);
+            //return Ok(await _mediator.Send(new AddCatCommand(newCat)));
         }
 
         // Update a specific cat
