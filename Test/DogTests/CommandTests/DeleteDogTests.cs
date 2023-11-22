@@ -1,7 +1,6 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
 using Application.Queries.Dogs;
 using Application.Queries.Dogs.GetAll;
-using Domain.Models;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -43,7 +42,7 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_DeleteDogInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidDogId = new Guid("12345678-1234-5678-1234-573295756731");
+            var invalidDogId = Guid.NewGuid();
             var deleteDogCommand = new DeleteDogByIdCommand(invalidDogId);
 
             /// Act

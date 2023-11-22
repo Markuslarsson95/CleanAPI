@@ -27,25 +27,23 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_UpdateDogValidId_ReturnsUpdatedDog()
         {
             // Arrange
-            var dogId = new Guid("12345678-1234-5678-1234-867428755756");
-            var dogDto = new DogDto()
+            var updateDogId = new Guid("12345678-1234-5678-1234-867428755756");
+            var updateDogDto = new DogDto()
             {
-                Name = "TestUpdate"
+                Name = "TestUpdateDog"
             };
 
             var query = new GetAllDogsQuery();
-            var command = new UpdateDogByIdCommand(dogDto, dogId);
+            var updateDogCommand = new UpdateDogByIdCommand(updateDogDto, updateDogId);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
-            //_mockDatabase.Dogs.Add(result);
-            List<Dog> dogs = _mockDatabase.Dogs;
-            var dogList = await _allDogsHandler.Handle(query, CancellationToken.None);
+            var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
+            var dogListAfterUpdate = await _allDogsHandler.Handle(query, CancellationToken.None);
 
 
             // Assert
-            Assert.NotNull(result);
-            Assert.That(dogList, Is.EqualTo(dogs));
+            Assert.NotNull(updatedDog);
+            Assert.That(dogListAfterUpdate, Does.Contain(updatedDog));
         }
 
         [Test]
