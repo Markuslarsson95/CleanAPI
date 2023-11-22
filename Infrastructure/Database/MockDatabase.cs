@@ -16,6 +16,12 @@ namespace Infrastructure.Database
             set { allCats = value; }
         }
 
+        public List<Bird> Birds
+        {
+            get { return allBirds; }
+            set { allBirds = value; }
+        }
+
         private static List<Dog> allDogs = new()
         {
             new Dog { Id = Guid.NewGuid(), Name = "Björn"},
@@ -34,6 +40,16 @@ namespace Infrastructure.Database
             new Cat { Id = new Guid("12345678-1234-5678-1234-372653665237"), Name = "TestCatForUnitTests", LikesToPlay = true},
             new Cat { Id = new Guid("12345678-1234-5678-1234-677758277550"), Name = "TestCatForUpdateUnitTests", LikesToPlay = true},
             new Cat { Id = new Guid("12345678-1234-5678-1234-472756427786"), Name = "TestCatForDeleteUnitTests", LikesToPlay = false},
+        };
+
+        private static List<Bird> allBirds = new()
+        {
+            new Bird { Id = Guid.NewGuid(), Name = "Peppe", CanFly = true},
+            new Bird { Id = Guid.NewGuid(), Name = "Charlie", CanFly = true},
+            new Bird { Id = Guid.NewGuid(), Name = "Kiwi", CanFly = false},
+            new Bird { Id = new Guid("12345678-1234-5678-1234-746573875749"), Name = "TestBirdForUnitTests", CanFly = false},
+            new Bird { Id = new Guid("12345678-1234-5678-1234-467580398558"), Name = "TestBirdForUpdateUnitTests", CanFly = false},
+            new Bird { Id = new Guid("12345678-1234-5678-1234-938538598395"), Name = "TestBirdForDeleteUnitTests", CanFly = true},
         };
     }
 }
