@@ -3,7 +3,7 @@ using Application.Dtos;
 using Application.Queries.Cats.GetAll;
 using Infrastructure.Database;
 
-namespace Test.DogTests.CommandTests
+namespace Test.CatTests.CommandTests
 {
     [TestFixture]
     public class UpdateCatTests
