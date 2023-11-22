@@ -1,5 +1,6 @@
 ﻿using Application.Commands.Dogs;
 using Application.Commands.Dogs.UpdateDog;
+using Application.Commands.Dogs.DeleteDog;
 using Application.Dtos;
 using Application.Queries.Dogs.GetAll;
 using Application.Queries.Dogs.GetById;
@@ -8,15 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace API.Controllers.DogsController
+namespace API.Controllers.DogController
 {
-    //TEST
     [Route("api/[controller]")]
     [ApiController]
-    public class DogsController : ControllerBase
+    public class DogController : ControllerBase
     {
         internal readonly IMediator _mediator;
-        public DogsController(IMediator mediator)
+        public DogController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -48,13 +48,19 @@ namespace API.Controllers.DogsController
 
         // Update a specific dog
         [HttpPut]
-        [Route("updateDog/{updatedDogId}")]
-        public async Task<IActionResult> UpdateDog([FromBody] DogDto updatedDog, Guid updatedDogId)
+        [Route("updateDog/{dogId}")]
+        public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId)
         {
-            return Ok(await _mediator.Send(new UpdateDogByIdCommand(updatedDog, updatedDogId)));
+            return Ok(await _mediator.Send(new UpdateDogByIdCommand(updatedDog, dogId)));
         }
 
-        // IMPLEMENT DELETE !!!
+        // Delete dog by id
+        [HttpDelete]
+        [Route("deleteDog/{dogId}")]
+        public async Task<IActionResult> DeleteDogById(Guid dogId)
+        {
+            return Ok(await _mediator.Send(new DeleteDogByIdCommand(dogId)));
+        }
 
     }
 }
