@@ -6,7 +6,7 @@ namespace Test.CatTests.QueryTest
     [TestFixture]
     public class GetCatByIdTests
     {
-        private GetDogByIdQueryHandler _handler;
+        private GetCatByIdQueryHandler _handler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -14,7 +14,7 @@ namespace Test.CatTests.QueryTest
         {
             // Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
-            _handler = new GetDogByIdQueryHandler(_mockDatabase);
+            _handler = new GetCatByIdQueryHandler(_mockDatabase);
         }
 
         [Test]
