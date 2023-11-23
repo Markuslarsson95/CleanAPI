@@ -1,12 +1,11 @@
 ﻿using Application.Dtos;
-using Domain.Models;
 using FluentValidation;
 
 namespace Application.Validators
 {
     public class CatValidator : AbstractValidator<CatDto>
     {
-        public CatValidator() 
+        public CatValidator()
         {
             RuleFor(cat => cat.Name).NotEmpty();
             RuleFor(cat => cat.LikesToPlay)

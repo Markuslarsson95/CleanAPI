@@ -48,7 +48,7 @@ namespace API.Controllers.DogController
 
             var validatorResult = await validator.ValidateAsync(addDogCommand);
 
-            if(!validatorResult.IsValid)
+            if (!validatorResult.IsValid)
             {
                 return ValidationProblem(validatorResult.ToString());
             }
