@@ -6,6 +6,7 @@ using Application.Queries.Dogs.GetAll;
 using Application.Queries.Dogs.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -41,17 +42,39 @@ namespace API.Controllers.DogController
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
-        public async Task<IActionResult> AddDog([FromBody] DogDto newDog)
+        public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
         {
-            return Ok(await _mediator.Send(new AddDogCommand(newDog)));
+            var addDogCommand = new AddDogCommand(newDog);
+
+            var validatorResult = await validator.ValidateAsync(addDogCommand);
+
+            if(!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(addDogCommand);
+
+            return Ok(addDogCommand);
         }
 
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
-        public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId)
+        public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId, IValidator<UpdateDogByIdCommand> validator)
         {
-            return Ok(await _mediator.Send(new UpdateDogByIdCommand(updatedDog, dogId)));
+            var updateDogCommand = new UpdateDogByIdCommand(updatedDog, dogId);
+
+            var validatorResult = await validator.ValidateAsync(updateDogCommand);
+
+            if (!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(updateDogCommand);
+
+            return Ok(updateDogCommand);
         }
 
         // Delete dog by id

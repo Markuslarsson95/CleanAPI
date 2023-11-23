@@ -3,6 +3,7 @@ using Application.Dtos;
 using Application.Queries.Birds;
 using Application.Queries.Birds.GetAll;
 using Domain.Models;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,17 +45,39 @@ namespace API.Controllers
         // Create a new bird 
         [HttpPost]
         [Route("addNewBird")]
-        public async Task<IActionResult> AddBird([FromBody] BirdDto newBird)
+        public async Task<IActionResult> AddBird([FromBody] BirdDto newBird, IValidator<AddBirdCommand> validator)
         {
-            return Ok(await _mediator.Send(new AddBirdCommand(newBird)));
+            var addBirdCommand = new AddBirdCommand(newBird);
+
+            var validatorResult = await validator.ValidateAsync(addBirdCommand);
+
+            if (!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(addBirdCommand);
+
+            return Ok(addBirdCommand);
         }
 
         // Update a specific bird
         [HttpPut]
         [Route("updateBird/{birdId}")]
-        public async Task<IActionResult> UpdateBirdById([FromBody] BirdDto updatedBird, Guid birdId)
+        public async Task<IActionResult> UpdateBirdById([FromBody] BirdDto updatedBird, Guid birdId, IValidator<UpdateBirdByIdCommand> validator)
         {
-            return Ok(await _mediator.Send(new UpdateBirdByIdCommand(updatedBird, birdId)));
+            var updateBirdCommand = new UpdateBirdByIdCommand(updatedBird, birdId);
+
+            var validatorResult = await validator.ValidateAsync(updateBirdCommand);
+
+            if (!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(updateBirdCommand);
+
+            return Ok(updateBirdCommand);
         }
 
         // Delete bird by id

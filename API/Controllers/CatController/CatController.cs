@@ -3,6 +3,7 @@ using Application.Dtos;
 using Application.Queries.Cats.GetAll;
 using Application.Queries.Cats.GetById;
 using Domain.Models;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,20 +45,39 @@ namespace API.Controllers.CatController
         // Create a new cat 
         [HttpPost]
         [Route("addNewCat")]
-        public async Task<IActionResult> AddCat([FromBody] CatDto newCat)
+        public async Task<IActionResult> AddCat([FromBody] CatDto newCat, IValidator<AddCatCommand> validator)
         {
-            var response = await _mediator.Send(new AddCatCommand(newCat));
+            var addCatCommand = new AddCatCommand(newCat);
 
-            return Ok(response);
-            //return Ok(await _mediator.Send(new AddCatCommand(newCat)));
+            var validatorResult = await validator.ValidateAsync(addCatCommand);
+
+            if (!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(addCatCommand);
+
+            return Ok(addCatCommand);
         }
 
         // Update a specific cat
         [HttpPut]
         [Route("updateCat/{catId}")]
-        public async Task<IActionResult> UpdateCatById([FromBody] CatDto updatedCat, Guid catId)
+        public async Task<IActionResult> UpdateCatById([FromBody] CatDto updatedCat, Guid catId, IValidator<UpdateCatByIdCommand> validator)
         {
-            return Ok(await _mediator.Send(new UpdateCatByIdCommand(updatedCat, catId)));
+            var updateCatCommand = new UpdateCatByIdCommand(updatedCat, catId);
+
+            var validatorResult = await validator.ValidateAsync(updateCatCommand);
+
+            if (!validatorResult.IsValid)
+            {
+                return ValidationProblem(validatorResult.ToString());
+            }
+
+            await _mediator.Send(updateCatCommand);
+
+            return Ok(updateCatCommand);
         }
 
         // Delete cat by id
