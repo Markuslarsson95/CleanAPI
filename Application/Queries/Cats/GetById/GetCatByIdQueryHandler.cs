@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Application.Queries.Cats.GetById
 {
-    public class GetDogByIdQueryHandler : IRequestHandler<GetCatByIdQuery, Cat>
+    public class GetCatByIdQueryHandler : IRequestHandler<GetCatByIdQuery, Cat>
     {
         private readonly MockDatabase _mockDatabase;
 
-        public GetDogByIdQueryHandler(MockDatabase mockDatabase)
+        public GetCatByIdQueryHandler(MockDatabase mockDatabase)
         {
             _mockDatabase = mockDatabase;
         }

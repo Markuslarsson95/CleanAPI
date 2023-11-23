@@ -18,7 +18,8 @@ namespace Application.Commands.Cats
             Cat catToCreate = new()
             {
                 Id = Guid.NewGuid(),
-                Name = request.NewCat.Name
+                Name = request.NewCat.Name,
+                LikesToPlay = request.NewCat.LikesToPlay,
             };
 
             _mockDatabase.Cats.Add(catToCreate);

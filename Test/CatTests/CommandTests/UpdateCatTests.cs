@@ -9,7 +9,7 @@ namespace Test.CatTests.CommandTests
     public class UpdateCatTests
     {
         private UpdateCatByIdCommandHandler _handler;
-        private GetAllCatsQueryHandler _allDogsHandler;
+        private GetAllCatsQueryHandler _allCatsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -18,11 +18,11 @@ namespace Test.CatTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new UpdateCatByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllCatsQueryHandler(_mockDatabase);
+            _allCatsHandler = new GetAllCatsQueryHandler(_mockDatabase);
         }
 
         [Test]
-        public async Task Handle_UpdateCatValidId_ReturnsUpdatedCat()
+        public async Task Handle_UpdateCatValidId_ReturnsUpdatedCatList()
         {
             // Arrange
             var catId = new Guid("12345678-1234-5678-1234-677758277550");
@@ -37,7 +37,7 @@ namespace Test.CatTests.CommandTests
 
             // Act
             var updatedCat = await _handler.Handle(updateCatComand, CancellationToken.None);
-            var catListAfterUpdate = await _allDogsHandler.Handle(query, CancellationToken.None);
+            var catListAfterUpdate = await _allCatsHandler.Handle(query, CancellationToken.None);
 
             // Assert
             Assert.NotNull(updatedCat);
