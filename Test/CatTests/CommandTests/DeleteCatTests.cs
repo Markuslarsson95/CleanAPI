@@ -8,7 +8,7 @@ namespace Test.CatTests.CommandTests
     public class DeleteCatTests
     {
         private DeleteCatByIdCommandHandler _handler;
-        private GetAllCatsQueryHandler _allDogsHandler;
+        private GetAllCatsQueryHandler _allCatsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -17,7 +17,7 @@ namespace Test.CatTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new DeleteCatByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllCatsQueryHandler(_mockDatabase);
+            _allCatsHandler = new GetAllCatsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Test.CatTests.CommandTests
             // Act
             var deletedCat = await _handler.Handle(deleteCatCommand, CancellationToken.None);
             var getAllCatsQuery = new GetAllCatsQuery();
-            var catListAfterDeletion = await _allDogsHandler.Handle(getAllCatsQuery, CancellationToken.None);
+            var catListAfterDeletion = await _allCatsHandler.Handle(getAllCatsQuery, CancellationToken.None);
 
             // Assert
             Assert.NotNull(deletedCat);

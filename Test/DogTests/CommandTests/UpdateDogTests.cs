@@ -2,7 +2,6 @@
 using Application.Dtos;
 using Application.Queries.Dogs;
 using Application.Queries.Dogs.GetAll;
-using Domain.Models;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -24,7 +23,7 @@ namespace Test.DogTests.CommandTests
         }
 
         [Test]
-        public async Task Handle_UpdateDogValidId_ReturnsUpdatedDog()
+        public async Task Handle_UpdateDogValidId_ReturnsUpdatedDogList()
         {
             // Arrange
             var updateDogId = new Guid("12345678-1234-5678-1234-867428755756");
