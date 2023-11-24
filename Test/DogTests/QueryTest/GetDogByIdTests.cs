@@ -23,10 +23,8 @@ namespace Test.DogTests.QueryTest
             // Arrange
             var dogId = new Guid("12345678-1234-5678-1234-567812345678");
 
-            var query = new GetDogByIdQuery(dogId);
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetDogByIdQuery(dogId), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -39,10 +37,8 @@ namespace Test.DogTests.QueryTest
             // Arrange
             var invalidDogId = Guid.NewGuid();
 
-            var query = new GetDogByIdQuery(invalidDogId);
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetDogByIdQuery(invalidDogId), CancellationToken.None);
 
             // Assert
             Assert.IsNull(result);

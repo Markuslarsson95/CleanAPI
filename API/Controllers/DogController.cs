@@ -7,10 +7,11 @@ using Application.Queries.Dogs.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using Domain.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace API.Controllers.DogController
+namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -25,23 +26,32 @@ namespace API.Controllers.DogController
         // Get all dogs from database
         [HttpGet]
         [Route("getAllDogs")]
+        [ProducesResponseType(typeof(List<Dog>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllDogs()
         {
             return Ok(await _mediator.Send(new GetAllDogsQuery()));
-            //return Ok("GET ALL DOGS");
         }
 
         // Get a dog by Id
         [HttpGet]
         [Route("getDogById/{dogId}")]
+        [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDogById(Guid dogId)
         {
-            return Ok(await _mediator.Send(new GetDogByIdQuery(dogId)));
+            var getDogResult = await _mediator.Send(new GetDogByIdQuery(dogId));
+
+            if (getDogResult == null)
+                return NotFound($"Dog with ID {dogId} not found");
+
+            return Ok(getDogResult);
         }
 
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
+        [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
         {
             var addDogCommand = new AddDogCommand(newDog);
@@ -61,18 +71,21 @@ namespace API.Controllers.DogController
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
+        [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId, IValidator<UpdateDogByIdCommand> validator)
         {
             var updateDogCommand = new UpdateDogByIdCommand(updatedDog, dogId);
+            var updatedDogResult = await _mediator.Send(updateDogCommand);
+
+            if (updatedDogResult == null)
+                return NotFound($"Dog with ID {dogId} not found");
 
             var validatorResult = await validator.ValidateAsync(updateDogCommand);
 
             if (!validatorResult.IsValid)
-            {
                 return ValidationProblem(validatorResult.ToString());
-            }
-
-            await _mediator.Send(updateDogCommand);
 
             return Ok(updateDogCommand);
         }
@@ -80,9 +93,16 @@ namespace API.Controllers.DogController
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
+        [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)
         {
-            return Ok(await _mediator.Send(new DeleteDogByIdCommand(dogId)));
+            var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
+
+            if (dogToDelete == null)
+                return NotFound($"Dog with ID {dogId} not found");
+
+            return Ok(dogToDelete);
         }
 
     }

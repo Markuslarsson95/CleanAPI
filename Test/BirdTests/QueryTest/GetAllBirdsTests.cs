@@ -24,10 +24,8 @@ namespace Test.BirdTests.QueryTest
             // Arrange
             List<Bird> birds = _mockDatabase.Birds;
 
-            var query = new GetAllBirdsQuery();
-
             // Act
-            var birdList = await _handler.Handle(query, CancellationToken.None);
+            var birdList = await _handler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(birdList);

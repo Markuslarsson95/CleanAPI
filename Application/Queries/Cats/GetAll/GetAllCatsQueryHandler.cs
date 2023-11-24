@@ -14,8 +14,8 @@ namespace Application.Queries.Cats.GetAll
         }
         public Task<List<Cat>> Handle(GetAllCatsQuery request, CancellationToken cancellationToken)
         {
-            List<Cat> allDogsFromMockDatabase = _mockDatabase.Cats;
-            return Task.FromResult(allDogsFromMockDatabase);
+            List<Cat> allCatsFromMockDatabase = _mockDatabase.Cats;
+            return Task.FromResult(allCatsFromMockDatabase);
         }
     }
 }

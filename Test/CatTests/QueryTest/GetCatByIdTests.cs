@@ -23,10 +23,8 @@ namespace Test.CatTests.QueryTest
             // Arrange
             var catId = new Guid("12345678-1234-5678-1234-372653665237");
 
-            var query = new GetCatByIdQuery(catId);
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetCatByIdQuery(catId), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -39,10 +37,8 @@ namespace Test.CatTests.QueryTest
             // Arrange
             var invalidCatId = Guid.NewGuid();
 
-            var query = new GetCatByIdQuery(invalidCatId);
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetCatByIdQuery(invalidCatId), CancellationToken.None);
 
             // Assert
             Assert.IsNull(result);

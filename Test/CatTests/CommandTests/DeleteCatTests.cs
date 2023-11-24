@@ -24,13 +24,11 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_DeleteCatValidId_RemovesCatFromList()
         {
             // Arrange
-            var catId = new Guid("12345678-1234-5678-1234-472756427786");
-            var deleteCatCommand = new DeleteCatByIdCommand(catId);
+            var deleteCatCommand = new DeleteCatByIdCommand(new Guid("12345678-1234-5678-1234-472756427786"));
 
             // Act
             var deletedCat = await _handler.Handle(deleteCatCommand, CancellationToken.None);
-            var getAllCatsQuery = new GetAllCatsQuery();
-            var catListAfterDeletion = await _allCatsHandler.Handle(getAllCatsQuery, CancellationToken.None);
+            var catListAfterDeletion = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(deletedCat);
@@ -41,8 +39,7 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_DeleteCatInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidCatId = Guid.NewGuid();
-            var deleteCatCommand = new DeleteCatByIdCommand(invalidCatId);
+            var deleteCatCommand = new DeleteCatByIdCommand(Guid.NewGuid());
 
             /// Act
             var deletedCat = await _handler.Handle(deleteCatCommand, CancellationToken.None);

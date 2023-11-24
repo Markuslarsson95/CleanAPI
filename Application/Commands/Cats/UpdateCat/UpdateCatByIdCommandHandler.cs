@@ -16,6 +16,9 @@ namespace Application.Commands.Cats
         {
             Cat catToUpdate = _mockDatabase.Cats.FirstOrDefault(cat => cat.Id == request.Id)!;
 
+            if (catToUpdate == null)
+                return Task.FromResult<Cat>(null!);
+
             catToUpdate.Name = request.UpdatedCat.Name;
             catToUpdate.LikesToPlay = request.UpdatedCat.LikesToPlay;
 

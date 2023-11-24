@@ -24,10 +24,8 @@ namespace Test.CatTests.QueryTest
             // Arrange
             List<Cat> cats = _mockDatabase.Cats;
 
-            var query = new GetAllCatsQuery();
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetAllCatsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);

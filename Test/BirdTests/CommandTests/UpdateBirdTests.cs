@@ -25,19 +25,15 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_UpdateBirdValidId_ReturnsUpdatedBirdList()
         {
             // Arrange
-            var birdId = new Guid("12345678-1234-5678-1234-467580398558");
-            var updateBirdDto = new BirdDto()
+            var updateBirdComand = new UpdateBirdByIdCommand(new BirdDto()
             {
                 Name = "TestUpdateBird",
                 CanFly = true
-            };
-
-            var query = new GetAllBirdsQuery();
-            var updateBirdComand = new UpdateBirdByIdCommand(updateBirdDto, birdId);
+            }, new Guid("12345678-1234-5678-1234-467580398558"));
 
             // Act
             var updatedBird = await _handler.Handle(updateBirdComand, CancellationToken.None);
-            var birdListAfterUpdate = await _allBirdsHandler.Handle(query, CancellationToken.None);
+            var birdListAfterUpdate = await _allBirdsHandler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(updatedBird);
@@ -48,18 +44,17 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_UpdateBirdInvalidId_ReturnsNullReferenceException()
         {
             // Arrange
-            var invalidBirdId = Guid.NewGuid();
-            var updateBirdDto = new BirdDto()
+            var updateBirdCommand = new UpdateBirdByIdCommand(new BirdDto()
             {
                 Name = "TestUpdateBird",
                 CanFly = true
-            };
+            }, Guid.NewGuid());
 
-            var updateBirdCommand = new UpdateBirdByIdCommand(updateBirdDto, invalidBirdId);
+            // Act
+            var updatedBird = await _handler.Handle(updateBirdCommand, CancellationToken.None);
 
-            // Act & Assert
-            Assert.ThrowsAsync<NullReferenceException>(
-                async () => await _handler.Handle(updateBirdCommand, CancellationToken.None));
+            // Assert
+            Assert.IsNull(updatedBird);
         }
     }
 }
