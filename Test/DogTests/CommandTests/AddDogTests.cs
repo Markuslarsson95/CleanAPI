@@ -26,14 +26,11 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_AddNewValidDog_ReturnsNewDogList()
         {
             // Arrange
-            var newDogDto = new DogDto { Name = "testNameDog" };
-            var addDogCommand = new AddDogCommand(newDogDto);
+            var addDogCommand = new AddDogCommand(new DogDto { Name = "testNameDog" });
 
             // Act
             var addedDog = await _handler.Handle(addDogCommand, CancellationToken.None);
-
-            var getAllDogsQuery = new GetAllDogsQuery();
-            var allDogs = await _allDogsHandler.Handle(getAllDogsQuery, CancellationToken.None);
+            var allDogs = await _allDogsHandler.Handle(new GetAllDogsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(addedDog);

@@ -25,14 +25,11 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_AddNewValidBird_ReturnsNewBirdList()
         {
             // Arrange
-            var newBirdDto = new BirdDto { Name = "testNameBird", CanFly = true };
-            var addBirdCommand = new AddBirdCommand(newBirdDto);
+            var addBirdCommand = new AddBirdCommand(new BirdDto { Name = "testNameBird", CanFly = true });
 
             // Act
             var addedBird = await _handler.Handle(addBirdCommand, CancellationToken.None);
-
-            var getAllBirdsQuery = new GetAllBirdsQuery();
-            var allBirds = await _allBirdsHandler.Handle(getAllBirdsQuery, CancellationToken.None);
+            var allBirds = await _allBirdsHandler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(addedBird);

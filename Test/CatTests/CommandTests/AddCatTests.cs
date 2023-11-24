@@ -25,14 +25,11 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_AddNewValidCat_ReturnsNewCatList()
         {
             // Arrange
-            var newCatDto = new CatDto { Name = "testNameCat", LikesToPlay = false };
-            var addCatCommand = new AddCatCommand(newCatDto);
+            var addCatCommand = new AddCatCommand(new CatDto { Name = "testNameCat", LikesToPlay = false });
 
             // Act
             var addedCat = await _handler.Handle(addCatCommand, CancellationToken.None);
-
-            var getAllCatsQuery = new GetAllCatsQuery();
-            var allCats = await _allCatsHandler.Handle(getAllCatsQuery, CancellationToken.None);
+            var allCats = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(addedCat);

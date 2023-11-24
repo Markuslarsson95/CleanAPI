@@ -24,13 +24,11 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_DeleteBirdValidId_RemovesBirdFromList()
         {
             // Arrange
-            var birdId = new Guid("12345678-1234-5678-1234-938538598395");
-            var deleteBirdCommand = new DeleteBirdByIdCommand(birdId);
+            var deleteBirdCommand = new DeleteBirdByIdCommand(new Guid("12345678-1234-5678-1234-938538598395"));
 
             // Act
             var deletedBird = await _handler.Handle(deleteBirdCommand, CancellationToken.None);
-            var getAllBirdsQuery = new GetAllBirdsQuery();
-            var birdListAfterDeletion = await _allBirdsHandler.Handle(getAllBirdsQuery, CancellationToken.None);
+            var birdListAfterDeletion = await _allBirdsHandler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(deletedBird);
@@ -41,8 +39,7 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_DeleteBirdInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidBirdId = Guid.NewGuid();
-            var deleteBirdCommand = new DeleteBirdByIdCommand(invalidBirdId);
+            var deleteBirdCommand = new DeleteBirdByIdCommand(Guid.NewGuid());
 
             /// Act
             var deletedBird = await _handler.Handle(deleteBirdCommand, CancellationToken.None);

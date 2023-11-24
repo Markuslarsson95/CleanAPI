@@ -23,10 +23,8 @@ namespace Test.BirdTests.QueryTest
             // Arrange
             var birdId = new Guid("12345678-1234-5678-1234-746573875749");
 
-            var query = new GetBirdByIdQuery(birdId);
-
             // Act
-            var bird = await _handler.Handle(query, CancellationToken.None);
+            var bird = await _handler.Handle(new GetBirdByIdQuery(birdId), CancellationToken.None);
 
             // Assert
             Assert.NotNull(bird);
@@ -39,10 +37,8 @@ namespace Test.BirdTests.QueryTest
             // Arrange
             var invalidBirdId = Guid.NewGuid();
 
-            var query = new GetBirdByIdQuery(invalidBirdId);
-
             // Act
-            var bird = await _handler.Handle(query, CancellationToken.None);
+            var bird = await _handler.Handle(new GetBirdByIdQuery(invalidBirdId), CancellationToken.None);
 
             // Assert
             Assert.IsNull(bird);

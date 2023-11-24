@@ -25,13 +25,11 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_DeleteDogValidId_RemovesDogFromList()
         {
             // Arrange
-            var dogId = new Guid("12345678-1234-5678-1234-573295756761");
-            var deleteDogCommand = new DeleteDogByIdCommand(dogId);
+            var deleteDogCommand = new DeleteDogByIdCommand(new Guid("12345678-1234-5678-1234-573295756761"));
 
             // Act
             var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
-            var getAllDogsQuery = new GetAllDogsQuery();
-            var dogListAfterDeletion = await _allDogsHandler.Handle(getAllDogsQuery, CancellationToken.None);
+            var dogListAfterDeletion = await _allDogsHandler.Handle(new GetAllDogsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(deletedDog);
@@ -42,8 +40,7 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_DeleteDogInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidDogId = Guid.NewGuid();
-            var deleteDogCommand = new DeleteDogByIdCommand(invalidDogId);
+            var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
 
             /// Act
             var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);

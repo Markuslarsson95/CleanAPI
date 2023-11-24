@@ -26,19 +26,14 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_UpdateDogValidId_ReturnsUpdatedDogList()
         {
             // Arrange
-            var updateDogId = new Guid("12345678-1234-5678-1234-867428755756");
-            var updateDogDto = new DogDto()
+            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
             {
                 Name = "TestUpdateDog"
-            };
-
-            var query = new GetAllDogsQuery();
-            var updateDogCommand = new UpdateDogByIdCommand(updateDogDto, updateDogId);
+            }, new Guid("12345678-1234-5678-1234-867428755756"));
 
             // Act
             var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
-            var dogListAfterUpdate = await _allDogsHandler.Handle(query, CancellationToken.None);
-
+            var dogListAfterUpdate = await _allDogsHandler.Handle(new GetAllDogsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(updatedDog);
@@ -46,20 +41,19 @@ namespace Test.DogTests.CommandTests
         }
 
         [Test]
-        public async Task Handle_UpdateDogInvalidId_ReturnsNullReferenceException()
+        public async Task Handle_UpdateDogInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidDogId = new Guid("87654321-4321-8765-4321-098765432109");
-            var dogDto = new DogDto()
+            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
             {
                 Name = "TestUpdate"
-            };
+            }, Guid.NewGuid());
 
-            var command = new UpdateDogByIdCommand(dogDto, invalidDogId);
+            // Act
+            var updateDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
 
-            // Act & Assert
-            Assert.ThrowsAsync<NullReferenceException>(
-                async () => await _handler.Handle(command, CancellationToken.None));
+            // Assert
+            Assert.IsNull(updateDog);
         }
     }
 }

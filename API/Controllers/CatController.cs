@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace API.Controllers.CatController
+namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -25,6 +25,7 @@ namespace API.Controllers.CatController
         // Get all cats from database
         [HttpGet]
         [Route("getAllCats")]
+        [ProducesResponseType(typeof(List<Cat>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllCats()
         {
             return Ok(await _mediator.Send(new GetAllCatsQuery()));
@@ -37,14 +38,19 @@ namespace API.Controllers.CatController
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCatById(Guid catId)
         {
-            var cat = await _mediator.Send(new GetCatByIdQuery(catId));
-            return cat == null ? NotFound() : Ok(cat);
-            //return Ok(await _mediator.Send(new GetCatByIdQuery(catId)));
+            var getCatResult = await _mediator.Send(new GetCatByIdQuery(catId));
+
+            if (getCatResult == null)
+                return NotFound($"Cat with ID {catId} not found");
+
+            return Ok(getCatResult);
         }
 
         // Create a new cat 
         [HttpPost]
         [Route("addNewCat")]
+        [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddCat([FromBody] CatDto newCat, IValidator<AddCatCommand> validator)
         {
             var addCatCommand = new AddCatCommand(newCat);
@@ -64,18 +70,21 @@ namespace API.Controllers.CatController
         // Update a specific cat
         [HttpPut]
         [Route("updateCat/{catId}")]
+        [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateCatById([FromBody] CatDto updatedCat, Guid catId, IValidator<UpdateCatByIdCommand> validator)
         {
             var updateCatCommand = new UpdateCatByIdCommand(updatedCat, catId);
+            var updatedCatResult = await _mediator.Send(updateCatCommand);
+
+            if (updatedCatResult == null)
+                return NotFound($"Cat with ID {catId} not found");
 
             var validatorResult = await validator.ValidateAsync(updateCatCommand);
 
             if (!validatorResult.IsValid)
-            {
                 return ValidationProblem(validatorResult.ToString());
-            }
-
-            await _mediator.Send(updateCatCommand);
 
             return Ok(updateCatCommand);
         }
@@ -83,9 +92,16 @@ namespace API.Controllers.CatController
         // Delete cat by id
         [HttpDelete]
         [Route("deleteCat/{catId}")]
+        [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteCatById(Guid catId)
         {
-            return Ok(await _mediator.Send(new DeleteCatByIdCommand(catId)));
+            var catToDelete = await _mediator.Send(new DeleteCatByIdCommand(catId));
+
+            if (catToDelete == null)
+                return NotFound($"Cat with ID {catId} not found");
+
+            return Ok(catToDelete);
         }
     }
 }

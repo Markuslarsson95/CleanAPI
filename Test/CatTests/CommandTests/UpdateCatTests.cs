@@ -25,19 +25,15 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_UpdateCatValidId_ReturnsUpdatedCatList()
         {
             // Arrange
-            var catId = new Guid("12345678-1234-5678-1234-677758277550");
-            var updateCatDto = new CatDto()
+            var updateCatComand = new UpdateCatByIdCommand(new CatDto()
             {
                 Name = "TestUpdateCat",
                 LikesToPlay = false
-            };
-
-            var query = new GetAllCatsQuery();
-            var updateCatComand = new UpdateCatByIdCommand(updateCatDto, catId);
+            }, new Guid("12345678-1234-5678-1234-677758277550"));
 
             // Act
             var updatedCat = await _handler.Handle(updateCatComand, CancellationToken.None);
-            var catListAfterUpdate = await _allCatsHandler.Handle(query, CancellationToken.None);
+            var catListAfterUpdate = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(updatedCat);
@@ -45,21 +41,20 @@ namespace Test.CatTests.CommandTests
         }
 
         [Test]
-        public async Task Handle_UpdateCatInvalidId_ReturnsNullReferenceException()
+        public async Task Handle_UpdateCatInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidCatId = Guid.NewGuid();
-            var updateCatDto = new CatDto()
+            var updateCatCommand = new UpdateCatByIdCommand(new CatDto()
             {
                 Name = "TestUpdateCat",
                 LikesToPlay = false
-            };
+            }, Guid.NewGuid());
 
-            var updateCatCommand = new UpdateCatByIdCommand(updateCatDto, invalidCatId);
+            // Act
+            var updatedCat = await _handler.Handle(updateCatCommand, CancellationToken.None);
 
-            // Act & Assert
-            Assert.ThrowsAsync<NullReferenceException>(
-                async () => await _handler.Handle(updateCatCommand, CancellationToken.None));
+            // Assert
+            Assert.IsNull(updatedCat);
         }
     }
 }

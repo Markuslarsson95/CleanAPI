@@ -25,10 +25,8 @@ namespace Test.DogTests.QueryTest
             // Arrange
             List<Dog> dogs = _mockDatabase.Dogs;
 
-            var query = new GetAllDogsQuery();
-
             // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+            var result = await _handler.Handle(new GetAllDogsQuery(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);

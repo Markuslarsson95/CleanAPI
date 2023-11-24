@@ -16,6 +16,9 @@ namespace Application.Commands.Dogs.UpdateDog
         {
             Dog dogToUpdate = _mockDatabase.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
 
+            if (dogToUpdate == null)
+                return Task.FromResult<Dog>(null!);
+
             dogToUpdate.Name = request.UpdatedDog.Name;
 
             return Task.FromResult(dogToUpdate);
