@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -50,6 +51,7 @@ namespace API.Controllers
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
+        [Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
@@ -71,6 +73,7 @@ namespace API.Controllers
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -93,6 +96,7 @@ namespace API.Controllers
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)

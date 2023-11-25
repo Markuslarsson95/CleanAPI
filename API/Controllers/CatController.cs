@@ -5,6 +5,7 @@ using Application.Queries.Cats.GetById;
 using Domain.Models;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -49,6 +50,7 @@ namespace API.Controllers
         // Create a new cat 
         [HttpPost]
         [Route("addNewCat")]
+        [Authorize]
         [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddCat([FromBody] CatDto newCat, IValidator<AddCatCommand> validator)
@@ -70,6 +72,7 @@ namespace API.Controllers
         // Update a specific cat
         [HttpPut]
         [Route("updateCat/{catId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -92,6 +95,7 @@ namespace API.Controllers
         // Delete cat by id
         [HttpDelete]
         [Route("deleteCat/{catId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteCatById(Guid catId)

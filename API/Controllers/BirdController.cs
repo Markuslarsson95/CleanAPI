@@ -5,6 +5,7 @@ using Application.Queries.Birds.GetAll;
 using Domain.Models;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -49,6 +50,7 @@ namespace API.Controllers
         // Create a new bird 
         [HttpPost]
         [Route("addNewBird")]
+        [Authorize]
         [ProducesResponseType(typeof(Bird), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddBird([FromBody] BirdDto newBird, IValidator<AddBirdCommand> validator)
@@ -70,6 +72,7 @@ namespace API.Controllers
         // Update a specific bird
         [HttpPut]
         [Route("updateBird/{birdId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Bird), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -92,6 +95,7 @@ namespace API.Controllers
         // Delete bird by id
         [HttpDelete]
         [Route("deleteBird/{birdId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Bird), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBirdById(Guid birdId)
