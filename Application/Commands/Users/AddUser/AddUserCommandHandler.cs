@@ -17,7 +17,7 @@ namespace Application.Commands.Users.AddUser
         {
             User userToCreate = new()
             {
-                UserName = request.NewUser.UserName, 
+                UserName = request.NewUser.UserName,
                 Password = request.NewUser.Password
             };
 

@@ -60,7 +60,7 @@ namespace Infrastructure.Database
 
         private static List<User> allUsers = new()
         {
-            
+
         };
     }
 }
