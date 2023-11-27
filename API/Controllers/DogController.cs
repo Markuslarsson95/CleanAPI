@@ -96,7 +96,7 @@ namespace API.Controllers
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)

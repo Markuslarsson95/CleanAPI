@@ -60,7 +60,8 @@ namespace Infrastructure.Database
 
         private static List<User> allUsers = new()
         {
-
+            new User { UserName = "Admin", Password = "admin"},
+            new User { UserName = "string", Password = "string"}
         };
     }
 }
