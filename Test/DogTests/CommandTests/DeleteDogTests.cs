@@ -1,6 +1,4 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
-using Application.Queries.Dogs;
-using Application.Queries.Dogs.GetAll;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -9,7 +7,6 @@ namespace Test.DogTests.CommandTests
     public class DeleteDogTests
     {
         private DeleteDogByIdCommandHandler _handler;
-        private GetAllDogsQueryHandler _allDogsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -18,7 +15,6 @@ namespace Test.DogTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new DeleteDogByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllDogsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -29,7 +25,7 @@ namespace Test.DogTests.CommandTests
 
             // Act
             var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
-            var dogListAfterDeletion = await _allDogsHandler.Handle(new GetAllDogsQuery(), CancellationToken.None);
+            var dogListAfterDeletion = _mockDatabase.Dogs;
 
             // Assert
             Assert.NotNull(deletedDog);

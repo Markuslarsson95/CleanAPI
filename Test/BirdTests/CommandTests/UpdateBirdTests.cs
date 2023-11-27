@@ -1,6 +1,5 @@
 ﻿using Application.Commands.Birds;
 using Application.Dtos;
-using Application.Queries.Birds.GetAll;
 using Infrastructure.Database;
 
 namespace Test.BirdTests.CommandTests
@@ -9,7 +8,6 @@ namespace Test.BirdTests.CommandTests
     public class UpdateBirdTests
     {
         private UpdateBirdByIdCommandHandler _handler;
-        private GetAllBirdsQueryHandler _allBirdsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -18,7 +16,6 @@ namespace Test.BirdTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new UpdateBirdByIdCommandHandler(_mockDatabase);
-            _allBirdsHandler = new GetAllBirdsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -33,7 +30,7 @@ namespace Test.BirdTests.CommandTests
 
             // Act
             var updatedBird = await _handler.Handle(updateBirdComand, CancellationToken.None);
-            var birdListAfterUpdate = await _allBirdsHandler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
+            var birdListAfterUpdate = _mockDatabase.Birds;
 
             // Assert
             Assert.NotNull(updatedBird);
