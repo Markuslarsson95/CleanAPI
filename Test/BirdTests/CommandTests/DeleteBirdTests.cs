@@ -1,5 +1,4 @@
 ﻿using Application.Commands.Birds;
-using Application.Queries.Birds.GetAll;
 using Infrastructure.Database;
 
 namespace Test.BirdTests.CommandTests
@@ -8,7 +7,6 @@ namespace Test.BirdTests.CommandTests
     public class DeleteBirdTests
     {
         private DeleteBirdByIdCommandHandler _handler;
-        private GetAllBirdsQueryHandler _allBirdsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -17,7 +15,6 @@ namespace Test.BirdTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new DeleteBirdByIdCommandHandler(_mockDatabase);
-            _allBirdsHandler = new GetAllBirdsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -28,7 +25,7 @@ namespace Test.BirdTests.CommandTests
 
             // Act
             var deletedBird = await _handler.Handle(deleteBirdCommand, CancellationToken.None);
-            var birdListAfterDeletion = await _allBirdsHandler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
+            var birdListAfterDeletion = _mockDatabase.Birds;
 
             // Assert
             Assert.NotNull(deletedBird);

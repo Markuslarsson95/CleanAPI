@@ -1,5 +1,4 @@
 ﻿using Application.Commands.Cats;
-using Application.Queries.Cats.GetAll;
 using Infrastructure.Database;
 
 namespace Test.CatTests.CommandTests
@@ -8,7 +7,6 @@ namespace Test.CatTests.CommandTests
     public class DeleteCatTests
     {
         private DeleteCatByIdCommandHandler _handler;
-        private GetAllCatsQueryHandler _allCatsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -17,7 +15,6 @@ namespace Test.CatTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new DeleteCatByIdCommandHandler(_mockDatabase);
-            _allCatsHandler = new GetAllCatsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -28,7 +25,7 @@ namespace Test.CatTests.CommandTests
 
             // Act
             var deletedCat = await _handler.Handle(deleteCatCommand, CancellationToken.None);
-            var catListAfterDeletion = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
+            var catListAfterDeletion = _mockDatabase.Cats;
 
             // Assert
             Assert.NotNull(deletedCat);
