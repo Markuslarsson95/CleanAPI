@@ -26,7 +26,7 @@ namespace Test.DogTests.CommandTests
             {
                 Name = "TestUpdateDog"
             }, new Guid("12345678-1234-5678-1234-867428755756"));
-
+            
             // Act
             var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
             var dogListAfterUpdate = _mockDatabase.Dogs;
