@@ -1,7 +1,4 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
-using Application.Queries.Dogs;
-using Application.Queries.Dogs.GetAll;
-using Domain.Models;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -10,7 +7,6 @@ namespace Test.DogTests.CommandTests
     public class DeleteDogTests
     {
         private DeleteDogByIdCommandHandler _handler;
-        private GetAllDogsQueryHandler _allDogsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -19,20 +15,17 @@ namespace Test.DogTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new DeleteDogByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllDogsQueryHandler(_mockDatabase);
         }
 
         [Test]
         public async Task Handle_DeleteDogValidId_RemovesDogFromList()
         {
             // Arrange
-            var dogId = new Guid("12345678-1234-5678-1234-573295756761");
-            var deleteDogCommand = new DeleteDogByIdCommand(dogId);
+            var deleteDogCommand = new DeleteDogByIdCommand(new Guid("12345678-1234-5678-1234-573295756761"));
 
             // Act
             var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
-            var getAllDogsQuery = new GetAllDogsQuery();
-            var dogListAfterDeletion = await _allDogsHandler.Handle(getAllDogsQuery, CancellationToken.None);
+            var dogListAfterDeletion = _mockDatabase.Dogs;
 
             // Assert
             Assert.NotNull(deletedDog);
@@ -43,8 +36,7 @@ namespace Test.DogTests.CommandTests
         public async Task Handle_DeleteDogInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidDogId = new Guid("12345678-1234-5678-1234-573295756731");
-            var deleteDogCommand = new DeleteDogByIdCommand(invalidDogId);
+            var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
 
             /// Act
             var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);

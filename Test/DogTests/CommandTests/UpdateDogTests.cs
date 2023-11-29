@@ -1,8 +1,5 @@
 ﻿using Application.Commands.Dogs.UpdateDog;
 using Application.Dtos;
-using Application.Queries.Dogs;
-using Application.Queries.Dogs.GetAll;
-using Domain.Models;
 using Infrastructure.Database;
 
 namespace Test.DogTests.CommandTests
@@ -11,7 +8,6 @@ namespace Test.DogTests.CommandTests
     public class UpdateDogTests
     {
         private UpdateDogByIdCommandHandler _handler;
-        private GetAllDogsQueryHandler _allDogsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -20,49 +16,40 @@ namespace Test.DogTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new UpdateDogByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllDogsQueryHandler(_mockDatabase);
         }
 
         [Test]
-        public async Task Handle_UpdateDogValidId_ReturnsUpdatedDog()
+        public async Task Handle_UpdateDogValidId_ReturnsUpdatedDogList()
         {
             // Arrange
-            var dogId = new Guid("12345678-1234-5678-1234-867428755756");
-            var dogDto = new DogDto()
+            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
             {
-                Name = "TestUpdate"
-            };
-
-            var query = new GetAllDogsQuery();
-            var command = new UpdateDogByIdCommand(dogDto, dogId);
+                Name = "TestUpdateDog"
+            }, new Guid("12345678-1234-5678-1234-867428755756"));
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
-            //_mockDatabase.Dogs.Add(result);
-            List<Dog> dogs = _mockDatabase.Dogs;
-            var dogList = await _allDogsHandler.Handle(query, CancellationToken.None);
-
+            var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
+            var dogListAfterUpdate = _mockDatabase.Dogs;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.That(dogList, Is.EqualTo(dogs));
+            Assert.NotNull(updatedDog);
+            Assert.That(dogListAfterUpdate, Does.Contain(updatedDog));
         }
 
         [Test]
-        public async Task Handle_UpdateDogInvalidId_ReturnsNullReferenceException()
+        public async Task Handle_UpdateDogInvalidId_ReturnsNull()
         {
             // Arrange
-            var invalidDogId = new Guid("87654321-4321-8765-4321-098765432109");
-            var dogDto = new DogDto()
+            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
             {
                 Name = "TestUpdate"
-            };
+            }, Guid.NewGuid());
 
-            var command = new UpdateDogByIdCommand(dogDto, invalidDogId);
+            // Act
+            var updateDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
 
-            // Act & Assert
-            Assert.ThrowsAsync<NullReferenceException>(
-                async () => await _handler.Handle(command, CancellationToken.None));
+            // Assert
+            Assert.IsNull(updateDog);
         }
     }
 }
