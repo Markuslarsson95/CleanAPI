@@ -13,6 +13,8 @@ namespace Application.Commands.Users.LoginUser
     {
         private readonly MockDatabase _mockDatabase;
         private readonly IConfiguration _configuration;
+        private const string Issuer = "https://localhost:7024";
+        private const string Audience = "https://localhost:7024";
 
         public LoginUserCommandHandler(MockDatabase mockDatabase, IConfiguration configuration)
         {
@@ -43,12 +45,16 @@ namespace Application.Commands.Users.LoginUser
             {
                 claims.Add(new Claim(ClaimTypes.Role, "Admin"));
             }
+            else
+                claims.Add(new Claim(ClaimTypes.Role, "User"));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
+                issuer: Issuer,
+                audience: Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
