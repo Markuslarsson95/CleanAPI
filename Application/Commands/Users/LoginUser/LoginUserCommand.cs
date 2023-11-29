@@ -1,5 +1,4 @@
 ﻿using Application.Dtos;
-using Domain.Models;
 using MediatR;
 
 namespace Application.Commands.Users.LoginUser

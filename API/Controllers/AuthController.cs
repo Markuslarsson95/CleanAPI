@@ -42,16 +42,16 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("login")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        public async Task<IActionResult> LoginUser([FromBody] UserDto loginUser)
+        //[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<IActionResult> LoginUser([FromBody] UserDto userDto)
         {
-            var loginUserCommand = new LoginUserCommand(loginUser);
-            var loginCommandResult = await _mediator.Send(loginUserCommand);
+            var loginUserCommand = new LoginUserCommand(userDto);
+            var jwtToken = await _mediator.Send(loginUserCommand);
 
-            if (loginCommandResult == null)
-                return NotFound("Password or username is wrong");
+            if (jwtToken is null)
+                return NotFound("User not found");
 
-            return Ok(loginCommandResult);
+            return Ok(jwtToken);
         }
     }
 }
