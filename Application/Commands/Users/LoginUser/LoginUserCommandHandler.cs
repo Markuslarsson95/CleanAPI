@@ -1,11 +1,7 @@
-﻿using Application.Abstractions;
-using Application.Abstractions.Messaging;
-using Application.Authentication;
-using Domain.Models;
+﻿using Domain.Models;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,17 +11,13 @@ namespace Application.Commands.Users.LoginUser
 {
     public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, string>
     {
-        private readonly JwtOptions _options;
         private readonly MockDatabase _mockDatabase;
         private readonly IConfiguration _configuration;
-        private readonly IJwtProvider _jwtProvider;
 
-        public LoginUserCommandHandler(MockDatabase mockDatabase, IConfiguration configuration, IJwtProvider jwtProvider, IOptions<JwtOptions> options)
+        public LoginUserCommandHandler(MockDatabase mockDatabase, IConfiguration configuration)
         {
             _mockDatabase = mockDatabase;
             _configuration = configuration;
-            _jwtProvider = jwtProvider;
-            _options = options.Value;
         }
 
         public Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -45,10 +37,7 @@ namespace Application.Commands.Users.LoginUser
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName)
-            };
+            { new Claim(ClaimTypes.Name, user.UserName) };
 
             if (user.UserName == "Admin")
             {
@@ -57,11 +46,9 @@ namespace Application.Commands.Users.LoginUser
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
             var token = new JwtSecurityToken(
-                issuer: "issuer",
-                audience: "audience",
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials

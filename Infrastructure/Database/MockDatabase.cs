@@ -60,8 +60,8 @@ namespace Infrastructure.Database
 
         private static List<User> allUsers = new()
         {
-            new User { Id = Guid.NewGuid(), UserName = "Admin", Password = "admin"},
-            new User { Id = Guid.NewGuid(), UserName = "string", Password = "string"}
+            new User { UserName = "Admin", Password = "admin"},
+            new User { UserName = "string", Password = "string"}
         };
     }
 }
