@@ -9,7 +9,6 @@ namespace Test.CatTests.CommandTests
     public class UpdateCatTests
     {
         private UpdateCatByIdCommandHandler _handler;
-        private GetAllCatsQueryHandler _allCatsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -18,7 +17,6 @@ namespace Test.CatTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new UpdateCatByIdCommandHandler(_mockDatabase);
-            _allCatsHandler = new GetAllCatsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -33,7 +31,7 @@ namespace Test.CatTests.CommandTests
 
             // Act
             var updatedCat = await _handler.Handle(updateCatComand, CancellationToken.None);
-            var catListAfterUpdate = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
+            var catListAfterUpdate = _mockDatabase.Cats;
 
             // Assert
             Assert.NotNull(updatedCat);

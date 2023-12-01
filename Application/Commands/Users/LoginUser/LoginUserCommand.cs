@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Commands.Users.LoginUser
 {
-    public sealed class LoginUserCommand : IRequest<User>
+    public sealed class LoginUserCommand : IRequest<string>
     {
         public LoginUserCommand(UserDto dtoLogin)
         {
