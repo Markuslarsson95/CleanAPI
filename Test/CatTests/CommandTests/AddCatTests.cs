@@ -1,6 +1,5 @@
 ﻿using Application.Commands.Cats;
 using Application.Dtos;
-using Application.Queries.Cats.GetAll;
 using Infrastructure.Database;
 
 namespace Test.CatTests.CommandTests
@@ -9,7 +8,6 @@ namespace Test.CatTests.CommandTests
     public class AddCatTests
     {
         private AddCatCommandHandler _handler;
-        private GetAllCatsQueryHandler _allCatsHandler;
         private MockDatabase _mockDatabase;
 
         [SetUp]
@@ -18,7 +16,6 @@ namespace Test.CatTests.CommandTests
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
             _handler = new AddCatCommandHandler(_mockDatabase);
-            _allCatsHandler = new GetAllCatsQueryHandler(_mockDatabase);
         }
 
         [Test]
@@ -29,7 +26,7 @@ namespace Test.CatTests.CommandTests
 
             // Act
             var addedCat = await _handler.Handle(addCatCommand, CancellationToken.None);
-            var allCats = await _allCatsHandler.Handle(new GetAllCatsQuery(), CancellationToken.None);
+            var allCats = _mockDatabase.Cats;
 
             // Assert
             Assert.NotNull(addedCat);
