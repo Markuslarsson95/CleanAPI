@@ -24,7 +24,7 @@ namespace Application.Commands.Dogs.DeleteDog
             if (dogToDelete == null)
                 return Task.FromResult<Dog>(null!);
 
-            //_mockDatabase.Dogs.Remove(dogToDelete);
+            _mockDatabase.Dogs.Remove(dogToDelete);
             _mySqlDB.Dogs.Remove(dogToDelete);
 
             _mySqlDB.SaveChanges();
