@@ -1,5 +1,6 @@
 ﻿using Application.Queries.Dogs.GetById;
 using Infrastructure.Database;
+using Infrastructure.RealDatabase;
 
 namespace Test.DogTests.QueryTest
 {
@@ -8,13 +9,14 @@ namespace Test.DogTests.QueryTest
     {
         private GetDogByIdQueryHandler _handler;
         private MockDatabase _mockDatabase;
+        private MySqlDB _mySqlDb;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
-            _handler = new GetDogByIdQueryHandler(_mockDatabase);
+            _handler = new GetDogByIdQueryHandler(_mockDatabase, _mySqlDb);
         }
 
         [Test]

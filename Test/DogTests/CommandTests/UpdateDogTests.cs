@@ -1,8 +1,7 @@
 ﻿using Application.Commands.Dogs.UpdateDog;
 using Application.Dtos;
-using Application.Queries.Dogs;
-using Application.Queries.Dogs.GetAll;
 using Infrastructure.Database;
+using Infrastructure.RealDatabase;
 
 namespace Test.DogTests.CommandTests
 {
@@ -10,16 +9,15 @@ namespace Test.DogTests.CommandTests
     public class UpdateDogTests
     {
         private UpdateDogByIdCommandHandler _handler;
-        private GetAllDogsQueryHandler _allDogsHandler;
         private MockDatabase _mockDatabase;
+        private MySqlDB _mySqlDb;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
-            _handler = new UpdateDogByIdCommandHandler(_mockDatabase);
-            _allDogsHandler = new GetAllDogsQueryHandler(_mockDatabase);
+            _handler = new UpdateDogByIdCommandHandler(_mockDatabase, _mySqlDb);
         }
 
         [Test]
@@ -33,7 +31,7 @@ namespace Test.DogTests.CommandTests
 
             // Act
             var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
-            var dogListAfterUpdate = await _allDogsHandler.Handle(new GetAllDogsQuery(), CancellationToken.None);
+            var dogListAfterUpdate = _mockDatabase.Dogs;
 
             // Assert
             Assert.NotNull(updatedDog);
