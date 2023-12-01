@@ -30,7 +30,14 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Dog>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllDogs()
         {
-            return Ok(await _mediator.Send(new GetAllDogsQuery()));
+            var dogList = await _mediator.Send(new GetAllDogsQuery());
+
+            if (dogList.Count <= 0)
+            {
+                return NotFound("No dogs found");
+            }
+
+            return Ok(dogList);
         }
 
         // Get a dog by Id
