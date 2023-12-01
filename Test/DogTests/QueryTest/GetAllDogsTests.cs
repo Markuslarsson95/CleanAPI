@@ -2,6 +2,7 @@
 using Application.Queries.Dogs.GetAll;
 using Domain.Models;
 using Infrastructure.Database;
+using Infrastructure.RealDatabase;
 
 namespace Test.DogTests.QueryTest
 {
@@ -10,13 +11,14 @@ namespace Test.DogTests.QueryTest
     {
         private GetAllDogsQueryHandler _handler;
         private MockDatabase _mockDatabase;
+        private MySqlDB _mySqlDb;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
             _mockDatabase = new MockDatabase();
-            _handler = new GetAllDogsQueryHandler(_mockDatabase);
+            _handler = new GetAllDogsQueryHandler(_mockDatabase, _mySqlDb);
         }
 
         [Test]

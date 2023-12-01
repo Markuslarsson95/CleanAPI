@@ -30,7 +30,14 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Dog>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllDogs()
         {
-            return Ok(await _mediator.Send(new GetAllDogsQuery()));
+            var dogList = await _mediator.Send(new GetAllDogsQuery());
+
+            if(dogList.Count <= 0)
+            {
+                return NotFound("No dogs found");
+            }
+
+            return Ok(dogList);
         }
 
         // Get a dog by Id
@@ -51,7 +58,7 @@ namespace API.Controllers
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
@@ -73,7 +80,7 @@ namespace API.Controllers
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -96,7 +103,7 @@ namespace API.Controllers
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)
