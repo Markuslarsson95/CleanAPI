@@ -32,7 +32,7 @@ namespace API.Controllers
         {
             var dogList = await _mediator.Send(new GetAllDogsQuery());
 
-            if(dogList.Count <= 0)
+            if (dogList.Count <= 0)
             {
                 return NotFound("No dogs found");
             }

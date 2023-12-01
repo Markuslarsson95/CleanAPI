@@ -8,7 +8,7 @@ namespace Infrastructure.RealDatabase
     {
         public MySqlDB() { }
 
-        public MySqlDB(DbContextOptions<MySqlDB>options) : base(options) { }
+        public MySqlDB(DbContextOptions<MySqlDB> options) : base(options) { }
 
         public DbSet<Dog> Dogs { get; set; }
 
@@ -22,9 +22,9 @@ namespace Infrastructure.RealDatabase
             modelBuilder.Entity<Dog>(entity => { entity.Property(e => e.Name).IsRequired(); });
 
             modelBuilder.Entity<Dog>().HasData(
-                new Dog{ Id = Guid.NewGuid(), Name = "Boss" },
-                new Dog{ Id = Guid.NewGuid(), Name = "Luffsen" },
-                new Dog{ Id = Guid.NewGuid(), Name = "Pim" }
+                new Dog { Id = Guid.NewGuid(), Name = "Boss" },
+                new Dog { Id = Guid.NewGuid(), Name = "Luffsen" },
+                new Dog { Id = Guid.NewGuid(), Name = "Pim" }
             );
         }
     }
