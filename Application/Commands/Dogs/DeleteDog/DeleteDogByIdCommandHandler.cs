@@ -1,6 +1,5 @@
 ﻿using Domain.Models;
 using Domain.Repositories;
-using Infrastructure.Database;
 using Infrastructure.RealDatabase;
 using MediatR;
 
@@ -26,9 +25,9 @@ namespace Application.Commands.Dogs.DeleteDog
                 return await Task.FromResult<Dog>(null!);
 
             _dogRepository.Delete(dogToDelete);
-            _mySqlDB.SaveChanges();
+            await _mySqlDB.SaveChangesAsync(cancellationToken);
 
-            return await Task.FromResult(dogToDelete);
+            return Task.FromResult(dogToDelete).Result;
         }
     }
 }

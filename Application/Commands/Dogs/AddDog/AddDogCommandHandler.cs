@@ -16,7 +16,7 @@ namespace Application.Commands.Dogs
             _dogRepository = dogRepository;
         }
 
-        public  Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
         {
             Dog dogToCreate = new()
             {
@@ -25,9 +25,9 @@ namespace Application.Commands.Dogs
             };
             _dogRepository.Add(dogToCreate);
 
-            _mySqlDb.SaveChanges();
+            await _mySqlDb.SaveChangesAsync(cancellationToken);
 
-            return Task.FromResult(dogToCreate);
+            return Task.FromResult(dogToCreate).Result;
         }
     }
 }

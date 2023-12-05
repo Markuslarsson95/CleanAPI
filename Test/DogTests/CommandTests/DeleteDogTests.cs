@@ -1,51 +1,55 @@
-﻿//using Application.Commands.Dogs.DeleteDog;
-//using Infrastructure.Database;
-//using Infrastructure.RealDatabase;
+﻿using Application.Commands.Dogs.DeleteDog;
+using Domain.Models;
+using Domain.Repositories;
+using Infrastructure.RealDatabase;
+using Moq;
+using MySqlX.XDevAPI.Common;
 
-//namespace Test.DogTests.CommandTests
-//{
-//    [TestFixture]
-//    public class DeleteDogTests
-//    {
-//        private DeleteDogByIdCommandHandler _handler;
-//        private MockDatabase _mockDatabase;
-//        private MySqlDB _mySqlDb;
+namespace Test.DogTests.CommandTests
+{
+    [TestFixture]
+    public class DeleteDogTests
+    {
+        private Mock<IDogRepository> _dogRepositoryMock;
+        private Mock<MySqlDB> _mySqlDbMock;
+        private DeleteDogByIdCommandHandler _handler;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            //Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _mySqlDb = new MySqlDB();
-//            _handler = new DeleteDogByIdCommandHandler(_mockDatabase, _mySqlDb);
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            //Initialize the handler and mock database before each test
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _mySqlDbMock = new Mock<MySqlDB>();
+            _handler = new DeleteDogByIdCommandHandler(_mySqlDbMock.Object, _dogRepositoryMock.Object);
+        }
 
-//        [Test]
-//        public async Task Handle_DeleteDogValidId_RemovesDogFromList()
-//        {
-//            // Arrange
-//            var deleteDogCommand = new DeleteDogByIdCommand(new Guid("50d5bb3e-0f5b-45fe-9a28-3c801db763d1"));
+        [Test]
+        public async Task Handle_DeleteDogValidId_RemovesDogFromList()
+        {
+            // Arrange
+            var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
 
-//            // Act
-//            var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
-//            var dogListAfterDeletion = _mySqlDb.Dogs.ToList();
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Test"});
+            _dogRepositoryMock.Setup(x => x.Delete(It.IsAny<Dog>()));
 
-//            // Assert
-//            Assert.NotNull(deletedDog);
-//            Assert.That(dogListAfterDeletion, Does.Not.Contain(deletedDog));
-//        }
+            // Act
+            await _handler.Handle(deleteDogCommand, default);
 
-//        [Test]
-//        public async Task Handle_DeleteDogInvalidId_ReturnsNull()
-//        {
-//            // Arrange
-//            var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
+            // Assert
+            _dogRepositoryMock.Verify(x => x.Delete(It.IsAny<Dog>()), Times.Once);
+        }
 
-//            /// Act
-//            var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
+        //[Test]
+        //public async Task Handle_DeleteDogInvalidId_ReturnsNull()
+        //{
+        //    // Arrange
+        //    var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
 
-//            // Assert
-//            Assert.Null(deletedDog);
-//        }
-//    }
-//}
+        //    /// Act
+        //    var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
+
+        //    // Assert
+        //    Assert.Null(deletedDog);
+        //}
+    }
+}

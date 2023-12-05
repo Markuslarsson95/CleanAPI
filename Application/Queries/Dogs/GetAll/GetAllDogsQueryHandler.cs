@@ -13,9 +13,9 @@ namespace Application.Queries.Dogs
         {
             _dogRepository = dogRepository;
         }
-        public  Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
+        public async Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            var dogList = _dogRepository.GetAll();
+            var dogList = await _dogRepository.GetAll();
 
             return Task.FromResult(dogList).Result;
         }

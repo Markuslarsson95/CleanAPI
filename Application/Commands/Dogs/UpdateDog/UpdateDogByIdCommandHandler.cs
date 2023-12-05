@@ -26,9 +26,9 @@ namespace Application.Commands.Dogs.UpdateDog
             dogToUpdate.Name = request.UpdatedDog.Name;
             _dogRepository.Update(dogToUpdate);
 
-            _mySqlDB.SaveChanges();
+            await _mySqlDB.SaveChangesAsync(cancellationToken);
 
-            return await Task.FromResult(dogToUpdate);
+            return Task.FromResult(dogToUpdate).Result;
         }
     }
 }
