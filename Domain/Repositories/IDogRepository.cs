@@ -7,7 +7,7 @@ namespace Domain.Repositories
         Task<List<Dog>> GetAll();
         Task<Dog> GetById(Guid id);
         void Add(Dog dog);
-        void Update(Dog dog, string name);
+        void Update(Dog dog);
         void Delete(Dog dog);
     }
 }

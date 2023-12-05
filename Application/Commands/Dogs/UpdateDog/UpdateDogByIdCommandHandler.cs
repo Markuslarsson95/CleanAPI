@@ -23,7 +23,8 @@ namespace Application.Commands.Dogs.UpdateDog
             if (dogToUpdate == null)
                 return await Task.FromResult<Dog>(null!);
 
-            _dogRepository.Update(dogToUpdate, request.UpdatedDog.Name);
+            dogToUpdate.Name = request.UpdatedDog.Name;
+            _dogRepository.Update(dogToUpdate);
 
             _mySqlDB.SaveChanges();
 

@@ -111,12 +111,12 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)
         {
-            var dogToDelete = _mediator.Send(new DeleteDogByIdCommand(dogId));
+            var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
 
             if (dogToDelete == null)
                 return NotFound($"Dog with ID {dogId} not found");
 
-            return Ok();
+            return Ok(dogToDelete);
         }
 
     }

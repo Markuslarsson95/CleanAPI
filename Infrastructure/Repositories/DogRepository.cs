@@ -1,7 +1,6 @@
 ﻿using Domain.Models;
 using Domain.Repositories;
 using Infrastructure.RealDatabase;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -41,9 +40,8 @@ namespace Infrastructure.Repositories
                 return await Task.FromResult<Dog>(null!);
         }
             
-        public void Update(Dog dog, string name)
+        public void Update(Dog dog)
         {
-            dog.Name = name;
             _mySqlDB.Dogs.Update(dog);
         }
     }
