@@ -18,10 +18,13 @@ namespace API.Controllers
     [ApiController]
     public class DogController : ControllerBase
     {
+        private readonly ILogger<DogController> _logger;
+
         internal readonly IMediator _mediator;
-        public DogController(IMediator mediator)
+        public DogController(IMediator mediator, ILogger<DogController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         // Get all dogs from database
@@ -58,7 +61,7 @@ namespace API.Controllers
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
@@ -80,7 +83,7 @@ namespace API.Controllers
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -103,17 +106,17 @@ namespace API.Controllers
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)
         {
-            var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
+            var dogToDelete = _mediator.Send(new DeleteDogByIdCommand(dogId));
 
             if (dogToDelete == null)
                 return NotFound($"Dog with ID {dogId} not found");
 
-            return Ok(dogToDelete);
+            return Ok();
         }
 
     }

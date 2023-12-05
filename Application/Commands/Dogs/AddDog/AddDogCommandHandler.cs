@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
+using Domain.Repositories;
 using Infrastructure.RealDatabase;
 using MediatR;
 
@@ -7,25 +7,23 @@ namespace Application.Commands.Dogs
 {
     public class AddDogCommandHandler : IRequestHandler<AddDogCommand, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
         private readonly MySqlDB _mySqlDb;
+        private readonly IDogRepository _dogRepository;
 
-        public AddDogCommandHandler(MockDatabase mockDatabase, MySqlDB mySqlDb)
+        public AddDogCommandHandler(MySqlDB mySqlDb, IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
             _mySqlDb = mySqlDb;
+            _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
+        public  Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
         {
             Dog dogToCreate = new()
             {
                 Id = Guid.NewGuid(),
                 Name = request.NewDog.Name
             };
-
-            //_mockDatabase.Dogs.Add(dogToCreate);
-            _mySqlDb.Dogs.Add(dogToCreate);
+            _dogRepository.Add(dogToCreate);
 
             _mySqlDb.SaveChanges();
 

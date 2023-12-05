@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
+using Domain.Repositories;
 using Infrastructure.RealDatabase;
 using MediatR;
 
@@ -7,27 +7,27 @@ namespace Application.Commands.Dogs.UpdateDog
 {
     public class UpdateDogByIdCommandHandler : IRequestHandler<UpdateDogByIdCommand, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
-        private readonly MySqlDB _mySqlDb;
+        private readonly MySqlDB _mySqlDB;
+        private readonly IDogRepository _dogRepository;
 
-        public UpdateDogByIdCommandHandler(MockDatabase mockDatabase, MySqlDB mySqlDb)
+        public UpdateDogByIdCommandHandler(MySqlDB mySqlDB, IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
-            _mySqlDb = mySqlDb;
+            _mySqlDB = mySqlDB;
+            _dogRepository = dogRepository;
         }
-        public Task<Dog> Handle(UpdateDogByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(UpdateDogByIdCommand request, CancellationToken cancellationToken)
         {
             //Dog dogToUpdate = _mockDatabase.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
-            Dog dogToUpdate = _mySqlDb.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
+            var dogToUpdate = await _dogRepository.GetById(request.Id);
 
             if (dogToUpdate == null)
-                return Task.FromResult<Dog>(null!);
+                return await Task.FromResult<Dog>(null!);
 
-            dogToUpdate.Name = request.UpdatedDog.Name;
+            _dogRepository.Update(dogToUpdate, request.UpdatedDog.Name);
 
-            _mySqlDb.SaveChanges();
+            _mySqlDB.SaveChanges();
 
-            return Task.FromResult(dogToUpdate);
+            return await Task.FromResult(dogToUpdate);
         }
     }
 }
