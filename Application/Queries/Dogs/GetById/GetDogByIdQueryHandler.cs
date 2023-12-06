@@ -6,21 +6,21 @@ namespace Application.Queries.Dogs.GetById
 {
     public class GetDogByIdQueryHandler : IRequestHandler<GetDogByIdQuery, Dog>
     {
-        private readonly IDogRepository _dogRepository;
+        private readonly IGenericRepository<Dog> _dogRepository;
 
-        public GetDogByIdQueryHandler(IDogRepository dogRepository)
+        public GetDogByIdQueryHandler(IGenericRepository<Dog> dogRepository)
         {
             _dogRepository = dogRepository;
         }
 
-        public async Task<Dog> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
+        public Task<Dog> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
         {
-            var wantedDog = await _dogRepository.GetById(request.Id);
+            var wantedDog = _dogRepository.GetById(request.Id);
 
             if (wantedDog == null)
-                return Task.FromResult<Dog>(null!).Result;
+                return Task.FromResult<Dog>(null!);
 
-            return Task.FromResult(wantedDog).Result;
+            return Task.FromResult(wantedDog);
         }
     }
 }

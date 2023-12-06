@@ -1,16 +1,16 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Commands.Cats
 {
     public class AddCatCommandHandler : IRequestHandler<AddCatCommand, Cat>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IGenericRepository<Cat> _catRepository;
 
-        public AddCatCommandHandler(MockDatabase mockDatabase)
+        public AddCatCommandHandler(IGenericRepository<Cat> catRepository)
         {
-            _mockDatabase = mockDatabase;
+            _catRepository = catRepository;
         }
 
         public Task<Cat> Handle(AddCatCommand request, CancellationToken cancellationToken)
@@ -21,8 +21,9 @@ namespace Application.Commands.Cats
                 Name = request.NewCat.Name,
                 LikesToPlay = request.NewCat.LikesToPlay,
             };
+            _catRepository.Add(catToCreate);
 
-            _mockDatabase.Cats.Add(catToCreate);
+            _catRepository.Save();
 
             return Task.FromResult(catToCreate);
         }

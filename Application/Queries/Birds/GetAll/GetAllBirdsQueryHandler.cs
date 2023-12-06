@@ -1,21 +1,22 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Queries.Birds.GetAll
 {
-    public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, List<Bird>>
+    public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, IEnumerable<Bird>>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IGenericRepository<Bird> _birdRepository;
 
-        public GetAllBirdsQueryHandler(MockDatabase mockDatabase)
+        public GetAllBirdsQueryHandler(IGenericRepository<Bird> birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
-        public Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
+        public Task<IEnumerable<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
         {
-            List<Bird> allBirdsFromMockDatabase = _mockDatabase.Birds;
-            return Task.FromResult(allBirdsFromMockDatabase);
+            var birdList = _birdRepository.GetAll();
+
+            return Task.FromResult(birdList);
         }
     }
 }

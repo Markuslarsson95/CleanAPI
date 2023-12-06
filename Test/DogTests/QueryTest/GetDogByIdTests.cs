@@ -8,14 +8,14 @@ namespace Test.DogTests.QueryTest
     [TestFixture]
     public class GetDogByIdTests
     {
-        private Mock<IDogRepository> _dogRepositoryMock;
+        private Mock<IGenericRepository<Dog>> _dogRepositoryMock;
         private GetDogByIdQueryHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
-            _dogRepositoryMock = new Mock<IDogRepository>();
+            _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
             _handler = new GetDogByIdQueryHandler(_dogRepositoryMock.Object);
         }
 
@@ -25,7 +25,7 @@ namespace Test.DogTests.QueryTest
             // Arrange
             var query = new GetDogByIdQuery(Guid.NewGuid());
 
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Update" });
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Dog { Id = Guid.NewGuid(), Name = "Update" });
 
             // Act
             var result = await _handler.Handle(query, default);
@@ -42,7 +42,7 @@ namespace Test.DogTests.QueryTest
             var query = new GetDogByIdQuery(Guid.NewGuid());
 
             // Setup the mock to return null
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Dog)null!);
 
             // Act
             var result = await _handler.Handle(query, default);

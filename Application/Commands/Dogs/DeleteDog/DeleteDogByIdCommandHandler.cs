@@ -6,25 +6,25 @@ namespace Application.Commands.Dogs.DeleteDog
 {
     public class DeleteDogByIdCommandHandler : IRequestHandler<DeleteDogByIdCommand, Dog>
     {
-        private readonly IDogRepository _dogRepository;
+        private readonly IGenericRepository<Dog> _dogRepository;
 
-        public DeleteDogByIdCommandHandler(IDogRepository dogRepository)
+        public DeleteDogByIdCommandHandler(IGenericRepository<Dog> dogRepository)
         {
             _dogRepository = dogRepository;
         }
 
-        public async Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
+        public Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
         {
-            var dogToDelete = await _dogRepository.GetById(request.Id);
+            var dogToDelete = _dogRepository.GetById(request.Id);
 
             if (dogToDelete == null)
-                return await Task.FromResult<Dog>(null!);
+                return Task.FromResult<Dog>(null!);
 
             _dogRepository.Delete(dogToDelete);
 
             _dogRepository.Save();
 
-            return Task.FromResult(dogToDelete).Result;
+            return Task.FromResult(dogToDelete);
         }
     }
 }

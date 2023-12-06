@@ -9,14 +9,14 @@ namespace Test.DogTests.CommandTests
     [TestFixture]
     public class AddDogTests
     {
-        private Mock<IDogRepository> _dogRepositoryMock;
+        private Mock<IGenericRepository<Dog>> _dogRepositoryMock;
         private AddDogCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _dogRepositoryMock = new Mock<IDogRepository>();
+            _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
             _handler = new AddDogCommandHandler(_dogRepositoryMock.Object);
         }
 

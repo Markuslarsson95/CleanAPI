@@ -1,16 +1,16 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Commands.Birds
 {
     public class AddBirdCommandHandler : IRequestHandler<AddBirdCommand, Bird>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IGenericRepository<Bird> _birdRepository;
 
-        public AddBirdCommandHandler(MockDatabase mockDatabase)
+        public AddBirdCommandHandler(IGenericRepository<Bird> birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
 
         public Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
@@ -21,8 +21,9 @@ namespace Application.Commands.Birds
                 Name = request.NewBird.Name,
                 CanFly = request.NewBird.CanFly
             };
+            _birdRepository.Add(birdToCreate);
 
-            _mockDatabase.Birds.Add(birdToCreate);
+            _birdRepository.Save();
 
             return Task.FromResult(birdToCreate);
         }
