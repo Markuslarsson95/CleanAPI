@@ -9,5 +9,6 @@ namespace Domain.Repositories
         void Add(Dog dog);
         void Update(Dog dog);
         void Delete(Dog dog);
+        void Save();
     }
 }

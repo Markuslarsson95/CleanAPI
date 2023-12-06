@@ -25,8 +25,8 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Dog>> GetAll()
         {
-           var dogList = _mySqlDB.Dogs.ToList();
-           return await Task.FromResult(dogList);
+            var dogList = _mySqlDB.Dogs.ToList();
+            return await Task.FromResult(dogList);
         }
 
         public async Task<Dog> GetById(Guid id)
@@ -39,7 +39,12 @@ namespace Infrastructure.Repositories
             else
                 return await Task.FromResult<Dog>(null!);
         }
-            
+
+        public void Save()
+        {
+            _mySqlDB.SaveChanges();
+        }
+
         public void Update(Dog dog)
         {
             _mySqlDB.Dogs.Update(dog);

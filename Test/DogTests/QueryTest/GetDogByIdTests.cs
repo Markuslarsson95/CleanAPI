@@ -1,49 +1,55 @@
-﻿//using Application.Queries.Dogs.GetById;
-//using Infrastructure.Database;
-//using Infrastructure.RealDatabase;
+﻿using Application.Queries.Dogs.GetById;
+using Domain.Models;
+using Domain.Repositories;
+using Moq;
 
-//namespace Test.DogTests.QueryTest
-//{
-//    [TestFixture]
-//    public class GetDogByIdTests
-//    {
-//        private GetDogByIdQueryHandler _handler;
-//        private MockDatabase _mockDatabase;
-//        private MySqlDB _mySqlDb;
+namespace Test.DogTests.QueryTest
+{
+    [TestFixture]
+    public class GetDogByIdTests
+    {
+        private Mock<IDogRepository> _dogRepositoryMock;
+        private GetDogByIdQueryHandler _handler;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            // Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _handler = new GetDogByIdQueryHandler(_mockDatabase, _mySqlDb);
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            // Initialize the handler and mock database before each test
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _handler = new GetDogByIdQueryHandler(_dogRepositoryMock.Object);
+        }
 
-//        [Test]
-//        public async Task Handle_ValidId_ReturnsCorrectDog()
-//        {
-//            // Arrange
-//            var dogId = new Guid("12345678-1234-5678-1234-567812345678");
+        [Test]
+        public async Task Handle_Should_ReturnDog_WhenValidId()
+        {
+            // Arrange
+            var query = new GetDogByIdQuery(Guid.NewGuid());
 
-//            // Act
-//            var result = await _handler.Handle(new GetDogByIdQuery(dogId), CancellationToken.None);
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Update" });
 
-//            // Assert
-//            Assert.NotNull(result);
-//            Assert.That(result.Id, Is.EqualTo(dogId));
-//        }
+            // Act
+            var result = await _handler.Handle(query, default);
 
-//        [Test]
-//        public async Task Handle_InvalidId_ReturnsNull()
-//        {
-//            // Arrange
-//            var invalidDogId = Guid.NewGuid();
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            _dogRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
+        }
 
-//            // Act
-//            var result = await _handler.Handle(new GetDogByIdQuery(invalidDogId), CancellationToken.None);
+        [Test]
+        public async Task Handle_Should_ReturnNull_WhenNotValidId()
+        {
+            // Arrange
+            var query = new GetDogByIdQuery(Guid.NewGuid());
 
-//            // Assert
-//            Assert.IsNull(result);
-//        }
-//    }
-//}
+            // Setup the mock to return null
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
+
+            // Act
+            var result = await _handler.Handle(query, default);
+
+            // Assert
+            Assert.That(result, Is.Null);
+            _dogRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
+        }
+    }
+}

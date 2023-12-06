@@ -1,57 +1,61 @@
-﻿//using Application.Commands.Dogs.UpdateDog;
-//using Application.Dtos;
-//using Infrastructure.Database;
-//using Infrastructure.RealDatabase;
+﻿using Application.Commands.Dogs.UpdateDog;
+using Application.Dtos;
+using Domain.Models;
+using Domain.Repositories;
+using Moq;
 
-//namespace Test.DogTests.CommandTests
-//{
-//    [TestFixture]
-//    public class UpdateDogTests
-//    {
-//        private UpdateDogByIdCommandHandler _handler;
-//        private MockDatabase _mockDatabase;
-//        private MySqlDB _mySqlDb;
+namespace Test.DogTests.CommandTests
+{
+    [TestFixture]
+    public class UpdateDogTests
+    {
+        private Mock<IDogRepository> _dogRepositoryMock;
+        private UpdateDogByIdCommandHandler _handler;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            //Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _handler = new UpdateDogByIdCommandHandler(_mockDatabase, _mySqlDb);
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            //Initialize the handler and mock database before each test
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _handler = new UpdateDogByIdCommandHandler(_dogRepositoryMock.Object);
+        }
 
-//        [Test]
-//        public async Task Handle_UpdateDogValidId_ReturnsUpdatedDogList()
-//        {
-//            // Arrange
-//            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
-//            {
-//                Name = "TestUpdateDog"
-//            }, new Guid("12345678-1234-5678-1234-867428755756"));
+        [Test]
+        public async Task Handle_Should_UpdateDog_WhenIdIsValid()
+        {
+            // Arrange
+            var command = new UpdateDogByIdCommand(new DogDto { Name = "Update" }, Guid.NewGuid());
 
-//            // Act
-//            var updatedDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
-//            var dogListAfterUpdate = _mockDatabase.Dogs;
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Update" });
+            _dogRepositoryMock.Setup(x => x.Update(It.IsAny<Dog>()));
 
-//            // Assert
-//            Assert.NotNull(updatedDog);
-//            Assert.That(dogListAfterUpdate, Does.Contain(updatedDog));
-//        }
+            // Act
+            var result = await _handler.Handle(command, default);
 
-//        [Test]
-//        public async Task Handle_UpdateDogInvalidId_ReturnsNull()
-//        {
-//            // Arrange
-//            var updateDogCommand = new UpdateDogByIdCommand(new DogDto()
-//            {
-//                Name = "TestUpdate"
-//            }, Guid.NewGuid());
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            _dogRepositoryMock.Verify(x => x.Update(It.Is<Dog>(d => d.Name == result.Name)), Times.Once);
+            _dogRepositoryMock.Verify(x => x.Update(It.Is<Dog>(d => d.Id == result.Id)), Times.Once);
+            _dogRepositoryMock.Verify(x => x.Save(), Times.Once);
+        }
 
-//            // Act
-//            var updateDog = await _handler.Handle(updateDogCommand, CancellationToken.None);
+        [Test]
+        public async Task Handle_Should_Not_UpdateDog_WhenIdIsNotValid()
+        {
+            // Arrange
+            var command = new UpdateDogByIdCommand(new DogDto { Name = "Update" }, Guid.NewGuid());
 
-//            // Assert
-//            Assert.IsNull(updateDog);
-//        }
-//    }
-//}
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
+            _dogRepositoryMock.Setup(x => x.Update(It.IsAny<Dog>()));
+
+            // Act
+            var result = await _handler.Handle(command, default);
+
+            // Assert
+            Assert.That(result, Is.Null);
+            _dogRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
+            _dogRepositoryMock.Verify(x => x.Update(It.IsAny<Dog>()), Times.Never);
+            _dogRepositoryMock.Verify(x => x.Save(), Times.Never);
+        }
+    }
+}

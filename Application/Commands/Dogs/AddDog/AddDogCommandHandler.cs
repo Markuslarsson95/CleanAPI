@@ -1,22 +1,19 @@
 ﻿using Domain.Models;
 using Domain.Repositories;
-using Infrastructure.RealDatabase;
 using MediatR;
 
 namespace Application.Commands.Dogs
 {
     public class AddDogCommandHandler : IRequestHandler<AddDogCommand, Dog>
     {
-        private readonly MySqlDB _mySqlDb;
         private readonly IDogRepository _dogRepository;
 
-        public AddDogCommandHandler(MySqlDB mySqlDb, IDogRepository dogRepository)
+        public AddDogCommandHandler(IDogRepository dogRepository)
         {
-            _mySqlDb = mySqlDb;
             _dogRepository = dogRepository;
         }
 
-        public async Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
+        public Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
         {
             Dog dogToCreate = new()
             {
@@ -25,9 +22,9 @@ namespace Application.Commands.Dogs
             };
             _dogRepository.Add(dogToCreate);
 
-            await _mySqlDb.SaveChangesAsync(cancellationToken);
+            _dogRepository.Save();
 
-            return Task.FromResult(dogToCreate).Result;
+            return Task.FromResult(dogToCreate);
         }
     }
 }
