@@ -1,35 +1,37 @@
-﻿//using Application.Queries.Birds.GetAll;
-//using Domain.Models;
-//using Infrastructure.Database;
+﻿using Application.Queries.Birds.GetAll;
+using Domain.Models;
+using Domain.Repositories;
+using Moq;
 
-//namespace Test.BirdTests.QueryTest
-//{
-//    [TestFixture]
-//    public class GetAllBirdsTests
-//    {
-//        private GetAllBirdsQueryHandler _handler;
-//        private MockDatabase _mockDatabase;
+namespace Test.BirdTests.QueryTest
+{
+    [TestFixture]
+    public class GetAllBirdsTests
+    {
+        private Mock<IGenericRepository<Bird>> _birdRepositoryMock;
+        private GetAllBirdsQueryHandler _handler;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            // Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _handler = new GetAllBirdsQueryHandler(_mockDatabase);
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            // Initialize the handler and mock database before each test
+            _birdRepositoryMock = new Mock<IGenericRepository<Bird>>();
+            _handler = new GetAllBirdsQueryHandler(_birdRepositoryMock.Object);
+        }
 
-//        [Test]
-//        public async Task Handle_ValidList_ReturnsAllBirds()
-//        {
-//            // Arrange
-//            List<Bird> birds = _mockDatabase.Birds;
+        [Test]
+        public async Task Handle_Should_ReturnBirdList()
+        {
+            // Arrange
+            var query = new GetAllBirdsQuery();
+            _birdRepositoryMock.Setup(x => x.GetAll()).Returns(new List<Bird>());
 
-//            // Act
-//            var birdList = await _handler.Handle(new GetAllBirdsQuery(), CancellationToken.None);
+            // Act
+            var result = await _handler.Handle(query, default);
 
-//            // Assert
-//            Assert.NotNull(birdList);
-//            Assert.That(birdList, Is.EqualTo(birds));
-//        }
-//    }
-//}
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            _birdRepositoryMock.Verify(x => x.GetAll(), Times.Once);
+        }
+    }
+}

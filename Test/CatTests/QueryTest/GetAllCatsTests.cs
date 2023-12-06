@@ -1,35 +1,37 @@
-﻿//using Application.Queries.Cats.GetAll;
-//using Domain.Models;
-//using Infrastructure.Database;
+﻿using Application.Queries.Cats.GetAll;
+using Domain.Models;
+using Domain.Repositories;
+using Moq;
 
-//namespace Test.CatTests.QueryTest
-//{
-//    [TestFixture]
-//    public class GetAllCatsTests
-//    {
-//        private GetAllCatsQueryHandler _handler;
-//        private MockDatabase _mockDatabase;
+namespace Test.catTests.QueryTest
+{
+    [TestFixture]
+    public class GetAllCatsTests
+    {
+        private Mock<IGenericRepository<Cat>> _catRepositoryMock;
+        private GetAllCatsQueryHandler _handler;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            // Initialize the handler and mock database before each test
-//            _mockDatabase = new MockDatabase();
-//            _handler = new GetAllCatsQueryHandler(_mockDatabase);
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            // Initialize the handler and mock database before each test
+            _catRepositoryMock = new Mock<IGenericRepository<Cat>>();
+            _handler = new GetAllCatsQueryHandler(_catRepositoryMock.Object);
+        }
 
-//        [Test]
-//        public async Task Handle_ValidList_ReturnsAllCats()
-//        {
-//            // Arrange
-//            List<Cat> cats = _mockDatabase.Cats;
+        [Test]
+        public async Task Handle_Should_ReturncatList()
+        {
+            // Arrange
+            var query = new GetAllCatsQuery();
+            _catRepositoryMock.Setup(x => x.GetAll()).Returns(new List<Cat>());
 
-//            // Act
-//            var result = await _handler.Handle(new GetAllCatsQuery(), CancellationToken.None);
+            // Act
+            var result = await _handler.Handle(query, default);
 
-//            // Assert
-//            Assert.NotNull(result);
-//            Assert.That(result, Is.EqualTo(cats));
-//        }
-//    }
-//}
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            _catRepositoryMock.Verify(x => x.GetAll(), Times.Once);
+        }
+    }
+}

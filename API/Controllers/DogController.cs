@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Application.Commands.Dogs.AddDog;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,9 +21,11 @@ namespace API.Controllers
     public class DogController : ControllerBase
     {
         internal readonly IMediator _mediator;
-        public DogController(IMediator mediator)
+        internal readonly AddDogCommandValidator _validator;
+        public DogController(IMediator mediator, AddDogCommandValidator validator)
         {
             _mediator = mediator;
+            _validator = validator;
         }
 
         // Get all dogs from database
@@ -33,10 +37,8 @@ namespace API.Controllers
         {
             var dogList = await _mediator.Send(new GetAllDogsQuery());
 
-            if (dogList.Count <= 0)
-            {
+            if (dogList.IsNullOrEmpty())
                 return NotFound("No dogs found");
-            }
 
             return Ok(dogList);
         }
@@ -59,29 +61,32 @@ namespace API.Controllers
         // Create a new dog 
         [HttpPost]
         [Route("addNewDog")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
+        public async Task<IActionResult> AddDog([FromBody] DogDto newDog)
         {
-            var addDogCommand = new AddDogCommand(newDog);
-
-            var validatorResult = await validator.ValidateAsync(addDogCommand);
+            var validatorResult = _validator.Validate(newDog);
 
             if (!validatorResult.IsValid)
             {
-                return ValidationProblem(validatorResult.ToString());
+                return BadRequest(validatorResult.ToString());
             }
 
-            await _mediator.Send(addDogCommand);
-
-            return Ok(addDogCommand);
+            try
+            {
+                return Ok(await _mediator.Send(new AddDogCommand(newDog)));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         // Update a specific dog
         [HttpPut]
         [Route("updateDog/{dogId}")]
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -98,13 +103,13 @@ namespace API.Controllers
             if (!validatorResult.IsValid)
                 return ValidationProblem(validatorResult.ToString());
 
-            return Ok(updateDogCommand);
+            return Ok(updatedDogResult);
         }
 
         // Delete dog by id
         [HttpDelete]
         [Route("deleteDog/{dogId}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)

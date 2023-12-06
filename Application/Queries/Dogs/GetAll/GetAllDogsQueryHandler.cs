@@ -5,19 +5,19 @@ using MediatR;
 
 namespace Application.Queries.Dogs
 {
-    public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, List<Dog>>
+    public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, IEnumerable<Dog>>
     {
-        private readonly IDogRepository _dogRepository;
+        private readonly IGenericRepository<Dog> _dogRepository;
 
-        public GetAllDogsQueryHandler(IDogRepository dogRepository)
+        public GetAllDogsQueryHandler(IGenericRepository<Dog> dogRepository)
         {
             _dogRepository = dogRepository;
         }
-        public async Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
+        public Task<IEnumerable<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            var dogList = await _dogRepository.GetAll();
+            var dogList = _dogRepository.GetAll();
 
-            return Task.FromResult(dogList).Result;
+            return Task.FromResult(dogList);
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Test.DogTests.CommandTests
     [TestFixture]
     public class DeleteDogTests
     {
-        private Mock<IDogRepository> _dogRepositoryMock;
+        private Mock<IGenericRepository<Dog>> _dogRepositoryMock;
         private DeleteDogByIdCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _dogRepositoryMock = new Mock<IDogRepository>();
+            _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
             _handler = new DeleteDogByIdCommandHandler(_dogRepositoryMock.Object);
         }
 
@@ -25,7 +25,7 @@ namespace Test.DogTests.CommandTests
             // Arrange
             var command = new DeleteDogByIdCommand(Guid.NewGuid());
 
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Test" });
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Dog { Id = Guid.NewGuid(), Name = "Test" });
             _dogRepositoryMock.Setup(x => x.Delete(It.IsAny<Dog>()));
 
             // Act
@@ -43,7 +43,7 @@ namespace Test.DogTests.CommandTests
             // Arrange
             var command = new DeleteDogByIdCommand(Guid.NewGuid());
 
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Dog)null!);
             _dogRepositoryMock.Setup(x => x.Delete(It.IsAny<Dog>()));
 
             /// Act

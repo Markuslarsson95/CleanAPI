@@ -6,9 +6,9 @@ namespace Application.Commands.Dogs
 {
     public class AddDogCommandHandler : IRequestHandler<AddDogCommand, Dog>
     {
-        private readonly IDogRepository _dogRepository;
+        private readonly IGenericRepository<Dog> _dogRepository;
 
-        public AddDogCommandHandler(IDogRepository dogRepository)
+        public AddDogCommandHandler(IGenericRepository<Dog> dogRepository)
         {
             _dogRepository = dogRepository;
         }

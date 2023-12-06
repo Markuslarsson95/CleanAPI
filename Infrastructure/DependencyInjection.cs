@@ -1,4 +1,5 @@
-﻿using Domain.Repositories;
+﻿using Domain.Models;
+using Domain.Repositories;
 using Infrastructure.Database;
 using Infrastructure.RealDatabase;
 using Infrastructure.Repositories;
@@ -10,7 +11,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddTransient<IDogRepository, DogRepository>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddSingleton<MockDatabase>();
             services.AddDbContext<MySqlDB>(/*options =>*/
             //{

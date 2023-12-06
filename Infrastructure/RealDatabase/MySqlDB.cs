@@ -10,6 +10,8 @@ namespace Infrastructure.RealDatabase
         public MySqlDB(DbContextOptions<MySqlDB> options) : base(options) { }
 
         public DbSet<Dog> Dogs { get; set; }
+        public DbSet<Bird> Birds { get; set; }
+        public DbSet<Cat> Cats { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
