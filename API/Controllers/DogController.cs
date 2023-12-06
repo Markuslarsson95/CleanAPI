@@ -18,13 +18,10 @@ namespace API.Controllers
     [ApiController]
     public class DogController : ControllerBase
     {
-        private readonly ILogger<DogController> _logger;
-
         internal readonly IMediator _mediator;
-        public DogController(IMediator mediator, ILogger<DogController> logger)
+        public DogController(IMediator mediator)
         {
             _mediator = mediator;
-            _logger = logger;
         }
 
         // Get all dogs from database
