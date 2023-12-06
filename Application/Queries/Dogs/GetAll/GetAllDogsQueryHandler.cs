@@ -1,26 +1,23 @@
 ﻿using Application.Queries.Dogs.GetAll;
 using Domain.Models;
-using Infrastructure.Database;
-using Infrastructure.RealDatabase;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Queries.Dogs
 {
     public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, List<Dog>>
     {
-        private readonly MockDatabase _mockDatabase;
-        private readonly MySqlDB _mySqlDb;
+        private readonly IDogRepository _dogRepository;
 
-        public GetAllDogsQueryHandler(MockDatabase mockDatabase, MySqlDB mySqlDb)
+        public GetAllDogsQueryHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
-            _mySqlDb = mySqlDb;
+            _dogRepository = dogRepository;
         }
-        public Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
+        public async Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            //List<Dog> allDogsFromMockDatabase = _mockDatabase.Dogs;
-            List<Dog> allDogsFromMockDatabase = _mySqlDb.Dogs.ToList();
-            return Task.FromResult(allDogsFromMockDatabase);
+            var dogList = await _dogRepository.GetAll();
+
+            return Task.FromResult(dogList).Result;
         }
     }
 }

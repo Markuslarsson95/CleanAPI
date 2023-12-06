@@ -1,30 +1,26 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
-using Infrastructure.RealDatabase;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Queries.Dogs.GetById
 {
     public class GetDogByIdQueryHandler : IRequestHandler<GetDogByIdQuery, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
-        private readonly MySqlDB _mySqlDb;
+        private readonly IDogRepository _dogRepository;
 
-        public GetDogByIdQueryHandler(MockDatabase mockDatabase, MySqlDB mySqlDb)
+        public GetDogByIdQueryHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
-            _mySqlDb = mySqlDb;
+            _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
         {
-            //Dog wantedDog = _mockDatabase.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
-            Dog wantedDog = _mySqlDb.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
+            var wantedDog = await _dogRepository.GetById(request.Id);
 
             if (wantedDog == null)
-                return Task.FromResult<Dog>(null!);
+                return Task.FromResult<Dog>(null!).Result;
 
-            return Task.FromResult(wantedDog);
+            return Task.FromResult(wantedDog).Result;
         }
     }
 }

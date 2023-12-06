@@ -28,6 +28,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getAllDogs")]
         [ProducesResponseType(typeof(List<Dog>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllDogs()
         {
             var dogList = await _mediator.Send(new GetAllDogsQuery());

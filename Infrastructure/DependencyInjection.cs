@@ -1,6 +1,7 @@
-﻿using Infrastructure.Database;
+﻿using Domain.Repositories;
+using Infrastructure.Database;
 using Infrastructure.RealDatabase;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure
@@ -9,6 +10,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
+            services.AddTransient<IDogRepository, DogRepository>();
             services.AddSingleton<MockDatabase>();
             services.AddDbContext<MySqlDB>(/*options =>*/
             //{

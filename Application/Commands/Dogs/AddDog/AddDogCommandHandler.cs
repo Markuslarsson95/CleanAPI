@@ -1,19 +1,16 @@
 ﻿using Domain.Models;
-using Infrastructure.Database;
-using Infrastructure.RealDatabase;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Commands.Dogs
 {
     public class AddDogCommandHandler : IRequestHandler<AddDogCommand, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
-        private readonly MySqlDB _mySqlDb;
+        private readonly IDogRepository _dogRepository;
 
-        public AddDogCommandHandler(MockDatabase mockDatabase, MySqlDB mySqlDb)
+        public AddDogCommandHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
-            _mySqlDb = mySqlDb;
+            _dogRepository = dogRepository;
         }
 
         public Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
@@ -23,11 +20,9 @@ namespace Application.Commands.Dogs
                 Id = Guid.NewGuid(),
                 Name = request.NewDog.Name
             };
+            _dogRepository.Add(dogToCreate);
 
-            //_mockDatabase.Dogs.Add(dogToCreate);
-            _mySqlDb.Dogs.Add(dogToCreate);
-
-            _mySqlDb.SaveChanges();
+            _dogRepository.Save();
 
             return Task.FromResult(dogToCreate);
         }
