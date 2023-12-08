@@ -24,9 +24,9 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_Should_UpdateCat_WhenIdIsValid()
         {
             // Arrange
-            var command = new UpdateCatByIdCommand(new CatDto { Name = "Update" }, Guid.NewGuid());
+            var command = new UpdateCatByIdCommand(new CatDto { Name = "Update", LikesToPlay = true}, Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Update" });
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Update" , LikesToPlay = false });
             _catRepositoryMock.Setup(x => x.Update(It.IsAny<Cat>()));
 
             // Act
@@ -43,7 +43,7 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_Should_Not_UpdateCat_WhenIdIsNotValid()
         {
             // Arrange
-            var command = new UpdateCatByIdCommand(new CatDto { Name = "Update" }, Guid.NewGuid());
+            var command = new UpdateCatByIdCommand(new CatDto { Name = "Update", LikesToPlay = false }, Guid.NewGuid());
 
             _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Cat)null!);
             _catRepositoryMock.Setup(x => x.Update(It.IsAny<Cat>()));

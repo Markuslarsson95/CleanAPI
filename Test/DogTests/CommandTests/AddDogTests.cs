@@ -15,7 +15,6 @@ namespace Test.DogTests.CommandTests
         [SetUp]
         public void SetUp()
         {
-            //Initialize the handler and mock database before each test
             _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
             _handler = new AddDogCommandHandler(_dogRepositoryMock.Object);
         }

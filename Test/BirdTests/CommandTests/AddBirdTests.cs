@@ -24,7 +24,7 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_Should_AddNewBird_WhenValid()
         {
             // Arrange
-            var addBirdCommand = new AddBirdCommand(new BirdDto { Name = "Test" });
+            var addBirdCommand = new AddBirdCommand(new BirdDto { Name = "Test", CanFly = true });
 
             _birdRepositoryMock.Setup(x => x.Add(
                 It.IsAny<Bird>()));
