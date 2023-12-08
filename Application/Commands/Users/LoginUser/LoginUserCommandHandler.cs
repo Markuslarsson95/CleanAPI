@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
 using Infrastructure.Database;
+using Infrastructure.RealDatabase;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,20 +12,20 @@ namespace Application.Commands.Users.LoginUser
 {
     public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, string>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly MySqlDB _mySqlDb;
         private readonly IConfiguration _configuration;
         private const string Issuer = "https://localhost:7024";
         private const string Audience = "https://localhost:7024";
 
-        public LoginUserCommandHandler(MockDatabase mockDatabase, IConfiguration configuration)
+        public LoginUserCommandHandler(MySqlDB mySqlDb, IConfiguration configuration)
         {
-            _mockDatabase = mockDatabase;
+            _mySqlDb = mySqlDb;
             _configuration = configuration;
         }
 
         public Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var wantedUser = _mockDatabase.Users.FirstOrDefault(x => x.UserName == request.UserLogin.UserName);
+            var wantedUser = _mySqlDb.Users.FirstOrDefault(x => x.UserName == request.UserLogin.UserName);
 
             if (wantedUser == null || wantedUser.Password != request.UserLogin.Password)
             {

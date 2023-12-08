@@ -25,9 +25,10 @@ namespace Infrastructure.Repositories
             return _dbSet.ToList();
         }
 
-        public void Add(T entity)
+        public async Task<T> Add(T entity)
         {
             _dbSet.Add(entity);
+            return await Task.FromResult(entity);
         }
 
         public void Update(T entity)

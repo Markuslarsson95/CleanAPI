@@ -13,18 +13,18 @@ namespace Application.Commands.Dogs
             _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
         {
             Dog dogToCreate = new()
             {
                 Id = Guid.NewGuid(),
                 Name = request.NewDog.Name
             };
-            _dogRepository.Add(dogToCreate);
+            await _dogRepository.Add(dogToCreate);
 
             _dogRepository.Save();
 
-            return Task.FromResult(dogToCreate);
+            return dogToCreate;
         }
     }
 }

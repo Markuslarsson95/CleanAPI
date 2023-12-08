@@ -13,7 +13,7 @@ namespace Application.Commands.Cats
             _catRepository = catRepository;
         }
 
-        public Task<Cat> Handle(AddCatCommand request, CancellationToken cancellationToken)
+        public async Task<Cat> Handle(AddCatCommand request, CancellationToken cancellationToken)
         {
             Cat catToCreate = new()
             {
@@ -21,11 +21,11 @@ namespace Application.Commands.Cats
                 Name = request.NewCat.Name,
                 LikesToPlay = request.NewCat.LikesToPlay,
             };
-            _catRepository.Add(catToCreate);
+            await _catRepository.Add(catToCreate);
 
             _catRepository.Save();
 
-            return Task.FromResult(catToCreate);
+            return catToCreate;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Application.Commands.Birds
             _birdRepository = birdRepository;
         }
 
-        public Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
+        public async Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
         {
             Bird birdToCreate = new()
             {
@@ -21,11 +21,11 @@ namespace Application.Commands.Birds
                 Name = request.NewBird.Name,
                 CanFly = request.NewBird.CanFly
             };
-            _birdRepository.Add(birdToCreate);
+            await _birdRepository.Add(birdToCreate);
 
             _birdRepository.Save();
 
-            return Task.FromResult(birdToCreate);
+            return birdToCreate;
         }
     }
 }

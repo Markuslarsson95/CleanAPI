@@ -25,7 +25,7 @@ namespace Test.CatTests.QueryTest
             // Arrange
             var query = new GetCatByIdQuery(Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Update" });
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Cat", LikesToPlay = true });
 
             // Act
             var result = await _handler.Handle(query, default);

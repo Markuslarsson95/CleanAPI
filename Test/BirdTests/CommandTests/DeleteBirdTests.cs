@@ -25,7 +25,7 @@ namespace Test.BirdTests.CommandTests
             // Arrange
             var command = new DeleteBirdByIdCommand(Guid.NewGuid());
 
-            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Bird { Id = Guid.NewGuid(), Name = "Test" });
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Bird { Id = Guid.NewGuid(), Name = "Test", CanFly = true });
             _birdRepositoryMock.Setup(x => x.Delete(It.IsAny<Bird>()));
 
             // Act

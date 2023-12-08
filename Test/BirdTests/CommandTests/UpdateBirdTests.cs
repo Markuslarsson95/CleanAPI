@@ -24,9 +24,9 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_Should_UpdateBird_WhenIdIsValid()
         {
             // Arrange
-            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update" }, Guid.NewGuid());
+            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update", CanFly = true }, Guid.NewGuid());
 
-            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Bird { Id = Guid.NewGuid(), Name = "Update" });
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Bird { Id = Guid.NewGuid(), Name = "Update", CanFly = true });
             _birdRepositoryMock.Setup(x => x.Update(It.IsAny<Bird>()));
 
             // Act
@@ -43,7 +43,7 @@ namespace Test.BirdTests.CommandTests
         public async Task Handle_Should_Not_UpdateBird_WhenIdIsNotValid()
         {
             // Arrange
-            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update" }, Guid.NewGuid());
+            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update", CanFly = false }, Guid.NewGuid());
 
             _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Bird)null!);
             _birdRepositoryMock.Setup(x => x.Update(It.IsAny<Bird>()));

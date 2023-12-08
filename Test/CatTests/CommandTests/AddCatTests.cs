@@ -24,7 +24,7 @@ namespace Test.CatTests.CommandTests
         public async Task Handle_Should_AddNewCat_WhenValid()
         {
             // Arrange
-            var addCatCommand = new AddCatCommand(new CatDto { Name = "Test" });
+            var addCatCommand = new AddCatCommand(new CatDto { Name = "Test", LikesToPlay = true });
 
             _catRepositoryMock.Setup(x => x.Add(
                 It.IsAny<Cat>()));
