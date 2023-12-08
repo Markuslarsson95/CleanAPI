@@ -4,7 +4,7 @@ using Domain.Models;
 using Domain.Repositories;
 using Moq;
 
-namespace Test.UserTests
+namespace Test.UserTests.CommandTests
 {
     [TestFixture]
     public class AddUserTests

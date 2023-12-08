@@ -20,7 +20,7 @@ namespace Test.BirdTests.ValidatorTests
         public void Validate_When_Name_IsLessThanTwoCharachtersLong_ReturnsError()
         {
             // Arrange
-            var command = new AddBirdCommand(new BirdDto { Name = "B", CanFly = true});
+            var command = new AddBirdCommand(new BirdDto { Name = "B", CanFly = true });
 
             // Act
             var result = _validator.TestValidate(command);

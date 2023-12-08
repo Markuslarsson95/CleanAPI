@@ -20,7 +20,7 @@ namespace Test.CatTests.ValidatorTests
         public void Validate_When_Name_IsLessThanTwoCharachtersLong_ReturnsError()
         {
             // Arrange
-            var command = new AddCatCommand(new CatDto { Name = "C", LikesToPlay = true});
+            var command = new AddCatCommand(new CatDto { Name = "C", LikesToPlay = true });
 
             // Act
             var result = _validator.TestValidate(command);
