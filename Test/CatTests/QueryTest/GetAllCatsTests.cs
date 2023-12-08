@@ -24,7 +24,7 @@ namespace Test.catTests.QueryTest
         {
             // Arrange
             var query = new GetAllCatsQuery();
-            _catRepositoryMock.Setup(x => x.GetAll()).Returns(new List<Cat>());
+            _catRepositoryMock.Setup(x => x.GetAll()).ReturnsAsync(new List<Cat>());
 
             // Act
             var result = await _handler.Handle(query, default);

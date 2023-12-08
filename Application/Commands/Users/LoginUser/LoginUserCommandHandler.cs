@@ -42,7 +42,7 @@ namespace Application.Commands.Users.LoginUser
             List<Claim> claims = new List<Claim>
             { new Claim(ClaimTypes.Name, user.UserName) };
 
-            if (user.UserName == "Admin")
+            if (user.UserName.ToLower() == "admin")
             {
                 claims.Add(new Claim(ClaimTypes.Role, "Admin"));
             }

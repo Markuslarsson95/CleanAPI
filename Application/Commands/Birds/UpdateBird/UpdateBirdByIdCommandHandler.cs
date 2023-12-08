@@ -12,20 +12,20 @@ namespace Application.Commands.Birds
         {
             _birdRepository = birdRepository;
         }
-        public Task<Bird> Handle(UpdateBirdByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Bird> Handle(UpdateBirdByIdCommand request, CancellationToken cancellationToken)
         {
-            var birdToUpdate = _birdRepository.GetById(request.Id);
+            var birdToUpdate = await _birdRepository.GetById(request.Id);
 
             if (birdToUpdate == null)
-                return Task.FromResult<Bird>(null!);
+                return await Task.FromResult<Bird>(null!);
 
             birdToUpdate.Name = request.UpdatedBird.Name;
             birdToUpdate.CanFly = request.UpdatedBird.CanFly;
-            _birdRepository.Update(birdToUpdate);
+            await _birdRepository.Update(birdToUpdate);
 
             _birdRepository.Save();
 
-            return Task.FromResult(birdToUpdate);
+            return birdToUpdate;
         }
     }
 }

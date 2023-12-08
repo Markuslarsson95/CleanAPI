@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Queries.Dogs
 {
-    public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, IEnumerable<Dog>>
+    public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, List<Dog>>
     {
         private readonly IGenericRepository<Dog> _dogRepository;
 
@@ -13,11 +13,11 @@ namespace Application.Queries.Dogs
         {
             _dogRepository = dogRepository;
         }
-        public Task<IEnumerable<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
+        public Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
             var dogList = _dogRepository.GetAll();
 
-            return Task.FromResult(dogList);
+            return dogList;
         }
     }
 }

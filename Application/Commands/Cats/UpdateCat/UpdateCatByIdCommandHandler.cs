@@ -12,20 +12,20 @@ namespace Application.Commands.Cats
         {
             _catRepository = catRepository;
         }
-        public Task<Cat> Handle(UpdateCatByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Cat> Handle(UpdateCatByIdCommand request, CancellationToken cancellationToken)
         {
-            var catToUpdate = _catRepository.GetById(request.Id);
+            var catToUpdate = await _catRepository.GetById(request.Id);
 
             if (catToUpdate == null)
-                return Task.FromResult<Cat>(null!);
+                return await Task.FromResult<Cat>(null!);
 
             catToUpdate.Name = request.UpdatedCat.Name;
             catToUpdate.LikesToPlay = request.UpdatedCat.LikesToPlay;
-            _catRepository.Update(catToUpdate);
+            await _catRepository.Update(catToUpdate);
 
             _catRepository.Save();
 
-            return Task.FromResult(catToUpdate);
+            return catToUpdate;
         }
     }
 }

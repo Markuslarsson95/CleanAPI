@@ -26,7 +26,7 @@ namespace Test.DogTests.CommandTests
             // Arrange
             var command = new UpdateDogByIdCommand(new DogDto { Name = "Update" }, Guid.NewGuid());
 
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Dog { Id = Guid.NewGuid(), Name = "Update" });
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Update" });
             _dogRepositoryMock.Setup(x => x.Update(It.IsAny<Dog>()));
 
             // Act
@@ -45,7 +45,7 @@ namespace Test.DogTests.CommandTests
             // Arrange
             var command = new UpdateDogByIdCommand(new DogDto { Name = "Update" }, Guid.NewGuid());
 
-            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Dog)null!);
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
             _dogRepositoryMock.Setup(x => x.Update(It.IsAny<Dog>()));
 
             // Act

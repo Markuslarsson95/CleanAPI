@@ -25,7 +25,7 @@ namespace Test.CatTests.CommandTests
             // Arrange
             var command = new DeleteCatByIdCommand(Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Test", LikesToPlay = true });
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Cat { Id = Guid.NewGuid(), Name = "Test", LikesToPlay = true });
             _catRepositoryMock.Setup(x => x.Delete(It.IsAny<Cat>()));
 
             // Act
@@ -43,7 +43,7 @@ namespace Test.CatTests.CommandTests
             // Arrange
             var command = new DeleteCatByIdCommand(Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Cat)null!);
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Cat)null!);
             _catRepositoryMock.Setup(x => x.Delete(It.IsAny<Cat>()));
 
             /// Act
