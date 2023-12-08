@@ -15,14 +15,23 @@ namespace Infrastructure.Repositories
             _dbSet = _mySqlDb.Set<T>();
         }
 
-        public T GetById(Guid id)
+        public async Task<T> GetById(Guid id)
         {
-            return _dbSet.Find(id);
+            try
+            {
+                var wantedObject = _dbSet.Find(id);
+                return await Task.FromResult(wantedObject!);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error occured while getting a {typeof(T).Name} with Id {id} from the database", ex);
+            }
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<List<T>> GetAll()
         {
-            return _dbSet.ToList();
+            var objectList = _dbSet.ToList();
+            return await Task.FromResult(objectList);
         }
 
         public async Task<T> Add(T entity)
@@ -31,14 +40,16 @@ namespace Infrastructure.Repositories
             return await Task.FromResult(entity);
         }
 
-        public void Update(T entity)
+        public async Task<T> Update(T entity)
         {
-            _mySqlDb.Entry(entity).State = EntityState.Modified;
+            _dbSet.Update(entity);
+            return await Task.FromResult(entity);
         }
 
-        public void Delete(T entity)
+        public async Task<T> Delete(T entity)
         {
             _dbSet.Remove(entity);
+            return await Task.FromResult(entity);
         }
 
         public void Save()

@@ -13,18 +13,18 @@ namespace Application.Commands.Dogs.DeleteDog
             _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
         {
-            var dogToDelete = _dogRepository.GetById(request.Id);
+            var dogToDelete = await _dogRepository.GetById(request.Id);
 
             if (dogToDelete == null)
-                return Task.FromResult<Dog>(null!);
+                return await Task.FromResult<Dog>(null!);
 
-            _dogRepository.Delete(dogToDelete);
+            await _dogRepository.Delete(dogToDelete);
 
             _dogRepository.Save();
 
-            return Task.FromResult(dogToDelete);
+            return dogToDelete;
         }
     }
 }

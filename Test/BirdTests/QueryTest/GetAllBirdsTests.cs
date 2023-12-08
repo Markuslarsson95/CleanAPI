@@ -24,7 +24,7 @@ namespace Test.BirdTests.QueryTest
         {
             // Arrange
             var query = new GetAllBirdsQuery();
-            _birdRepositoryMock.Setup(x => x.GetAll()).Returns(new List<Bird>());
+            _birdRepositoryMock.Setup(x => x.GetAll()).ReturnsAsync(new List<Bird>());
 
             // Act
             var result = await _handler.Handle(query, default);

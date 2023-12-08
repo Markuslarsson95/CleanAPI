@@ -26,7 +26,7 @@ namespace Test.CatTests.CommandTests
             // Arrange
             var command = new UpdateCatByIdCommand(new CatDto { Name = "Update", LikesToPlay = true }, Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Cat { Id = Guid.NewGuid(), Name = "Update", LikesToPlay = false });
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Cat { Id = Guid.NewGuid(), Name = "Update", LikesToPlay = false });
             _catRepositoryMock.Setup(x => x.Update(It.IsAny<Cat>()));
 
             // Act
@@ -45,7 +45,7 @@ namespace Test.CatTests.CommandTests
             // Arrange
             var command = new UpdateCatByIdCommand(new CatDto { Name = "Update", LikesToPlay = false }, Guid.NewGuid());
 
-            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Cat)null!);
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Cat)null!);
             _catRepositoryMock.Setup(x => x.Update(It.IsAny<Cat>()));
 
             // Act

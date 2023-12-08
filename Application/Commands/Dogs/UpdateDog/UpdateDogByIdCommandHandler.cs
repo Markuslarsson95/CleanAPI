@@ -12,19 +12,19 @@ namespace Application.Commands.Dogs.UpdateDog
         {
             _dogRepository = dogRepository;
         }
-        public Task<Dog> Handle(UpdateDogByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(UpdateDogByIdCommand request, CancellationToken cancellationToken)
         {
-            var dogToUpdate = _dogRepository.GetById(request.Id);
+            var dogToUpdate = await _dogRepository.GetById(request.Id);
 
             if (dogToUpdate == null)
-                return Task.FromResult<Dog>(null!);
+                return await Task.FromResult<Dog>(null!);
 
             dogToUpdate.Name = request.UpdatedDog.Name;
-            _dogRepository.Update(dogToUpdate);
+            await _dogRepository.Update(dogToUpdate);
 
             _dogRepository.Save();
 
-            return Task.FromResult(dogToUpdate);
+            return dogToUpdate;
         }
     }
 }

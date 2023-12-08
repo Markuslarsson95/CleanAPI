@@ -15,12 +15,12 @@ namespace Application.Queries.Cats.GetById
 
         public Task<Cat> Handle(GetCatByIdQuery request, CancellationToken cancellationToken)
         {
-            Cat wantedCat = _catRepository.GetById(request.Id);
+            var wantedCat = _catRepository.GetById(request.Id);
 
             if (wantedCat == null)
                 return Task.FromResult<Cat>(null!);
 
-            return Task.FromResult(wantedCat);
+            return wantedCat;
         }
     }
 }

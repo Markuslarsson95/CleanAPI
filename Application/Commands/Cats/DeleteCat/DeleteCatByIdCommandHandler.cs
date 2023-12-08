@@ -13,18 +13,18 @@ namespace Application.Commands.Cats
             _catRepository = catRepository;
         }
 
-        public Task<Cat> Handle(DeleteCatByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Cat> Handle(DeleteCatByIdCommand request, CancellationToken cancellationToken)
         {
-            var catToDelete = _catRepository.GetById(request.Id);
+            var catToDelete = await _catRepository.GetById(request.Id);
 
             if (catToDelete == null)
-                return Task.FromResult<Cat>(null!);
+                return await Task.FromResult<Cat>(null!);
 
-            _catRepository.Delete(catToDelete);
+            await _catRepository.Delete(catToDelete);
 
             _catRepository.Save();
 
-            return Task.FromResult(catToDelete);
+            return catToDelete;
         }
     }
 }

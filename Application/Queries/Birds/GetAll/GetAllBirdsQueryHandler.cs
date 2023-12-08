@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Queries.Birds.GetAll
 {
-    public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, IEnumerable<Bird>>
+    public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, List<Bird>>
     {
         private readonly IGenericRepository<Bird> _birdRepository;
 
@@ -12,11 +12,11 @@ namespace Application.Queries.Birds.GetAll
         {
             _birdRepository = birdRepository;
         }
-        public Task<IEnumerable<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
+        public Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
         {
             var birdList = _birdRepository.GetAll();
 
-            return Task.FromResult(birdList);
+            return birdList;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Test.BirdTests.QueryTest
             // Arrange
             var query = new GetBirdByIdQuery(Guid.NewGuid());
 
-            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(new Bird { Id = Guid.NewGuid(), Name = "Update", CanFly = false });
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Bird { Id = Guid.NewGuid(), Name = "Update", CanFly = false });
 
             // Act
             var result = await _handler.Handle(query, default);
@@ -42,7 +42,7 @@ namespace Test.BirdTests.QueryTest
             var query = new GetBirdByIdQuery(Guid.NewGuid());
 
             // Setup the mock to return null
-            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns((Bird)null!);
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Bird)null!);
 
             // Act
             var result = await _handler.Handle(query, default);

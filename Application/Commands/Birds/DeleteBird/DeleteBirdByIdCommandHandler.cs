@@ -13,18 +13,18 @@ namespace Application.Commands.Birds
             _birdRepository = birdRepository;
         }
 
-        public Task<Bird> Handle(DeleteBirdByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Bird> Handle(DeleteBirdByIdCommand request, CancellationToken cancellationToken)
         {
-            var birdToDelete = _birdRepository.GetById(request.Id);
+            var birdToDelete = await _birdRepository.GetById(request.Id);
 
             if (birdToDelete == null)
-                return Task.FromResult<Bird>(null!);
+                return await Task.FromResult<Bird>(null!);
 
-            _birdRepository.Delete(birdToDelete);
+            await _birdRepository.Delete(birdToDelete);
 
             _birdRepository.Save();
 
-            return Task.FromResult(birdToDelete);
+            return birdToDelete;
         }
     }
 }

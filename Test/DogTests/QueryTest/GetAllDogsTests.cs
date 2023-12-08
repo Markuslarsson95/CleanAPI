@@ -25,7 +25,7 @@ namespace Test.DogTests.QueryTest
         {
             // Arrange
             var query = new GetAllDogsQuery();
-            _dogRepositoryMock.Setup(x => x.GetAll()).Returns(new List<Dog>());
+            _dogRepositoryMock.Setup(x => x.GetAll()).ReturnsAsync(new List<Dog>());
 
             // Act
             var result = await _handler.Handle(query, default);

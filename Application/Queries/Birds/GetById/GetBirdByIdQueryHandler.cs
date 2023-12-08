@@ -20,7 +20,7 @@ namespace Application.Queries.Birds
             if (wantedBird == null)
                 return Task.FromResult<Bird>(null!);
 
-            return Task.FromResult(wantedBird);
+            return wantedBird;
         }
     }
 }

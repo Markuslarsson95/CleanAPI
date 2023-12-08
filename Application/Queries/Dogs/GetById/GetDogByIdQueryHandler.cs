@@ -20,7 +20,7 @@ namespace Application.Queries.Dogs.GetById
             if (wantedDog == null)
                 return Task.FromResult<Dog>(null!);
 
-            return Task.FromResult(wantedDog);
+            return wantedDog;
         }
     }
 }
