@@ -1,4 +1,5 @@
-﻿using Application.Commands.Dogs.AddDog;
+﻿using Application.Commands.Dogs;
+using Application.Commands.Dogs.AddDog;
 using Application.Dtos;
 using FluentValidation.TestHelper;
 
@@ -19,52 +20,52 @@ namespace Test.DogTests.ValidatorTests
         public void Validate_When_Name_IsLessThanTwoCharachtersLong_ReturnsError()
         {
             // Arrange
-            var command = new DogDto { Name = "T" };
+            var command = new AddDogCommand(new DogDto { Name = "T" });
 
             // Act
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name);
+            result.ShouldHaveValidationErrorFor(x => x.NewDog.Name);
         }
 
         [Test]
         public void Validate_When_Name_IsMoreThanThirtyCharactersLong_ReturnsError()
         {
             // Arrange
-            var command = new DogDto { Name = "Teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest" };
+            var command = new AddDogCommand(new DogDto { Name = "Teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest" });
 
             // Act
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name);
+            result.ShouldHaveValidationErrorFor(x => x.NewDog.Name);
         }
 
         [Test]
         public void Validate_When_Name_IsNull_ReturnsError()
         {
             // Arrange
-            var command = new DogDto { Name = null! };
+            var command = new AddDogCommand(new DogDto { Name = null! });
 
             // Act
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name);
+            result.ShouldHaveValidationErrorFor(x => x.NewDog.Name);
         }
 
         [Test]
         public void Validate_When_NewDog_IsValid_ReturnsNoErrors()
         {
             // Arrange
-            var command = new DogDto { Name = "Dog" };
+            var command = new AddDogCommand(new DogDto { Name = "Dog" });
 
             // Act
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.Name);
+            result.ShouldNotHaveValidationErrorFor(x => x.NewDog.Name);
         }
     }
 }

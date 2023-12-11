@@ -1,69 +1,25 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
-using Infrastructure.RealDatabase;
+﻿using Domain.Repositories;
 using MediatR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Application.Commands.Users.LoginUser
 {
     public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, string>
     {
-        private readonly MySqlDB _mySqlDb;
-        private readonly IConfiguration _configuration;
-        private const string Issuer = "https://localhost:7024";
-        private const string Audience = "https://localhost:7024";
+        private readonly ILoginRepository _loginRepository;
 
-        public LoginUserCommandHandler(MySqlDB mySqlDb, IConfiguration configuration)
+        public LoginUserCommandHandler(ILoginRepository loginRepository)
         {
-            _mySqlDb = mySqlDb;
-            _configuration = configuration;
+            _loginRepository = loginRepository;
         }
 
-        public Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var wantedUser = _mySqlDb.Users.FirstOrDefault(x => x.UserName == request.UserLogin.UserName);
+            var loginToken = await _loginRepository.Login(request.UserLogin.UserName, request.UserLogin.Password);
 
-            if (wantedUser == null || wantedUser.Password != request.UserLogin.Password)
-            {
-                return Task.FromResult<string>(null!);
-            }
+            if (loginToken == null)
+                return await Task.FromResult<string>(null!);
 
-            var token = CreateToken(wantedUser);
-
-            return Task.FromResult(token);
-        }
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>
-            { new Claim(ClaimTypes.Name, user.UserName) };
-
-            if (user.UserName.ToLower() == "admin")
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-            }
-            else
-                claims.Add(new Claim(ClaimTypes.Role, "User"));
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: Issuer,
-                audience: Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials
-                );
-
-            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwtToken;
+            return await Task.FromResult(loginToken);
         }
     }
 }

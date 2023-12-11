@@ -6,11 +6,11 @@ namespace Application.Commands.Users.AddUser
 {
     public sealed class AddUserCommandHandler : IRequestHandler<AddUserCommand, User>
     {
-        private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<User> _genericUserRepository;
 
-        public AddUserCommandHandler(IGenericRepository<User> userRepository)
+        public AddUserCommandHandler(IGenericRepository<User> genericUserRepository)
         {
-            _userRepository = userRepository;
+            _genericUserRepository = genericUserRepository;
         }
 
         public async Task<User> Handle(AddUserCommand request, CancellationToken cancellationToken)
@@ -20,12 +20,11 @@ namespace Application.Commands.Users.AddUser
                 UserName = request.NewUser.UserName,
                 Password = request.NewUser.Password
             };
+            await _genericUserRepository.Add(userToCreate);
 
-            await _userRepository.Add(userToCreate);
+            _genericUserRepository.Save();
 
-            _userRepository.Save();
-
-            return userToCreate;
+            return await Task.FromResult(userToCreate);
         }
     }
 }
