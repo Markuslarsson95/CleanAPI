@@ -10,7 +10,6 @@ using FluentValidation;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using Application.Commands.Dogs.AddDog;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,11 +20,9 @@ namespace API.Controllers
     public class DogController : ControllerBase
     {
         internal readonly IMediator _mediator;
-        internal readonly AddDogCommandValidator _validator;
-        public DogController(IMediator mediator, AddDogCommandValidator validator)
+        public DogController(IMediator mediator)
         {
             _mediator = mediator;
-            _validator = validator;
         }
 
         // Get all dogs from database
@@ -64,9 +61,9 @@ namespace API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddDog([FromBody] DogDto newDog)
+        public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
         {
-            var validatorResult = _validator.Validate(newDog);
+            var validatorResult = validator.Validate(new AddDogCommand(newDog));
 
             if (!validatorResult.IsValid)
             {

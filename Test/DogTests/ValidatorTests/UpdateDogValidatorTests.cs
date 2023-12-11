@@ -1,5 +1,4 @@
-﻿using Application.Commands.Cats;
-using Application.Commands.Dogs.UpdateDog;
+﻿using Application.Commands.Dogs.UpdateDog;
 using Application.Dtos;
 using FluentValidation.TestHelper;
 
