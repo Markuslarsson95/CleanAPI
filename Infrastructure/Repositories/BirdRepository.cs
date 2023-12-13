@@ -1,4 +1,4 @@
-﻿using Domain.Models.Animal;
+﻿using Domain.Models.Animals;
 using Infrastructure.RealDatabase;
 
 namespace Infrastructure.Repositories

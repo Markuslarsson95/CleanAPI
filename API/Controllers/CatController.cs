@@ -2,7 +2,7 @@
 using Application.Dtos;
 using Application.Queries.Cats.GetAll;
 using Application.Queries.Cats.GetById;
-using Domain.Models.Animal;
+using Domain.Models.Animals;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

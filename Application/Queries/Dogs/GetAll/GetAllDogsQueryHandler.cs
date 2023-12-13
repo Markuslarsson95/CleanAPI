@@ -1,5 +1,5 @@
 ﻿using Application.Queries.Dogs.GetAll;
-using Domain.Models.Animal;
+using Domain.Models.Animals;
 using Infrastructure.Repositories;
 using MediatR;
 

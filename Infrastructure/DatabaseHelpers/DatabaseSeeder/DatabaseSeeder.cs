@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Domain.Models.Animal;
+using Domain.Models.Animals;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DatabaseHelpers.DatabaseSeeder

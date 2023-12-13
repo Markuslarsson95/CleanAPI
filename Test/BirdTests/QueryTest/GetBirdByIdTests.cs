@@ -1,5 +1,5 @@
 ﻿using Application.Queries.Birds;
-using Domain.Models.Animal;
+using Domain.Models.Animals;
 using Infrastructure.Repositories;
 using Moq;
 

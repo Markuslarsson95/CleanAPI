@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Animal
+﻿namespace Domain.Models.Animals
 {
     public class Dog : Animal
     {
