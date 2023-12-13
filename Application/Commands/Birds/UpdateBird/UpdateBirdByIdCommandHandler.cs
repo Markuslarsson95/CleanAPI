@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Birds
 {
     public class UpdateBirdByIdCommandHandler : IRequestHandler<UpdateBirdByIdCommand, Bird>
     {
-        private readonly IGenericRepository<Bird> _birdRepository;
+        private readonly IBirdRepository _birdRepository;
 
-        public UpdateBirdByIdCommandHandler(IGenericRepository<Bird> birdRepository)
+        public UpdateBirdByIdCommandHandler(IBirdRepository birdRepository)
         {
             _birdRepository = birdRepository;
         }
@@ -21,9 +21,8 @@ namespace Application.Commands.Birds
 
             birdToUpdate.Name = request.UpdatedBird.Name;
             birdToUpdate.CanFly = request.UpdatedBird.CanFly;
+            birdToUpdate.Color = request.UpdatedBird.Color;
             await _birdRepository.Update(birdToUpdate);
-
-            _birdRepository.Save();
 
             return birdToUpdate;
         }

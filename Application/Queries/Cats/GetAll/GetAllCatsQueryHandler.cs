@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Queries.Cats.GetAll
 {
     public class GetAllCatsQueryHandler : IRequestHandler<GetAllCatsQuery, List<Cat>>
     {
-        private readonly IGenericRepository<Cat> _catRepository;
+        private readonly ICatRepository _catRepository;
 
-        public GetAllCatsQueryHandler(IGenericRepository<Cat> catRepository)
+        public GetAllCatsQueryHandler(ICatRepository catRepository)
         {
             _catRepository = catRepository;
         }

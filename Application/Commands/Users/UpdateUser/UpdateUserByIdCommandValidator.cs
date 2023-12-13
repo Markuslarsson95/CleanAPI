@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
 using FluentValidation;
+using Infrastructure.Repositories;
 
 namespace Application.Commands.Users.UpdateUser
 {
     public class UpdateUserByIdCommandValidator : AbstractValidator<UpdateUserByIdCommand>
     {
-        private readonly IGenericRepository<User> _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UpdateUserByIdCommandValidator(IGenericRepository<User> userRepository)
+        public UpdateUserByIdCommandValidator(IUserRepository userRepository)
         {
             _userRepository = userRepository;
 

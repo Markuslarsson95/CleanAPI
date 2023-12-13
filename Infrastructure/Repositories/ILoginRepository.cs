@@ -1,5 +1,4 @@
-﻿
-namespace Domain.Repositories
+﻿namespace Infrastructure.Repositories
 {
     public interface ILoginRepository
     {

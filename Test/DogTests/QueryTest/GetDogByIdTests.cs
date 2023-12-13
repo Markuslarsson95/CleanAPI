@@ -1,6 +1,6 @@
 ﻿using Application.Queries.Dogs.GetById;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.DogTests.QueryTest
@@ -8,14 +8,14 @@ namespace Test.DogTests.QueryTest
     [TestFixture]
     public class GetDogByIdTests
     {
-        private Mock<IGenericRepository<Dog>> _dogRepositoryMock;
+        private Mock<IDogRepository> _dogRepositoryMock;
         private GetDogByIdQueryHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
-            _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
+            _dogRepositoryMock = new Mock<IDogRepository>();
             _handler = new GetDogByIdQueryHandler(_dogRepositoryMock.Object);
         }
 

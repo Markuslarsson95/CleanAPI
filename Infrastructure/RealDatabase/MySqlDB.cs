@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Infrastructure.DatabaseHelpers.DatabaseSeeder;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.RealDatabase
@@ -9,30 +10,25 @@ namespace Infrastructure.RealDatabase
 
         public MySqlDB(DbContextOptions<MySqlDB> options) : base(options) { }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<Dog> Dogs { get; set; }
         public DbSet<Bird> Birds { get; set; }
         public DbSet<Cat> Cats { get; set; }
-        public DbSet<User> Users { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL("server=localhost;database=animals;user=root;password=1234");
+            //Mysql
+            //optionsBuilder.UseMySQL("server=localhost;database=animals;user=root;password=1234");
+            optionsBuilder.UseSqlServer("Server=(local)\\sqlexpress;Database=animals;Trusted_Connection=true;TrustServerCertificate=true;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Dog>(entity => { entity.Property(e => e.Name).IsRequired(); });
-            modelBuilder.Entity<User>(entity => { entity.Property(e => e.UserName).IsRequired(); });
-            modelBuilder.Entity<User>(entity => { entity.Property(e => e.Password).IsRequired(); });
+            base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Dog>().HasData(
-                new Dog { Id = Guid.NewGuid(), Name = "Boss" },
-                new Dog { Id = Guid.NewGuid(), Name = "Luffsen" },
-                new Dog { Id = Guid.NewGuid(), Name = "Pim" });
-
-            modelBuilder.Entity<User>().HasData(
-                new User { Id = Guid.NewGuid(), UserName = "string", Password = "string" },
-                new User { Id = Guid.NewGuid(), UserName = "admin", Password = "admin" });
+            // Call the SeedData method from the external class
+            DatabaseSeeder.SeedData(modelBuilder);
         }
     }
 }

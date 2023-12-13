@@ -1,8 +1,8 @@
 ﻿using Application.Commands.Users.AddUser;
 using Application.Dtos;
 using Domain.Models;
-using Domain.Repositories;
 using Infrastructure.RealDatabase;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.UserTests.CommandTests
@@ -10,7 +10,7 @@ namespace Test.UserTests.CommandTests
     [TestFixture]
     public class AddUserTests
     {
-        private Mock<IGenericRepository<User>> _userRepositoryMock;
+        private Mock<IUserRepository> _userRepositoryMock;
         private Mock<MySqlDB> _mySqlDbMock = new Mock<MySqlDB>();
         private AddUserCommandHandler _handler;
 
@@ -18,8 +18,7 @@ namespace Test.UserTests.CommandTests
         public void Setup()
         {
             _mySqlDbMock.Setup(x => x.Add(It.IsAny<User>()));
-            _mySqlDbMock.Setup(x => x.SaveChanges());
-            _userRepositoryMock = new Mock<IGenericRepository<User>>();
+            _userRepositoryMock = new Mock<IUserRepository>();
             _handler = new AddUserCommandHandler(_userRepositoryMock.Object);
         }
 
@@ -36,7 +35,6 @@ namespace Test.UserTests.CommandTests
             Assert.That(result, Is.Not.Null);
             _userRepositoryMock.Verify(x => x.Add(It.Is<User>(u => u.Id == result.Id
             && u.UserName == result.UserName && u.Password == result.Password)), Times.Once);
-            _userRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
     }
 }

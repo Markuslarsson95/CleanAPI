@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Cats;
 using Application.Dtos;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.CatTests.CommandTests
@@ -9,14 +9,14 @@ namespace Test.CatTests.CommandTests
     [TestFixture]
     public class UpdateCatTests
     {
-        private Mock<IGenericRepository<Cat>> _catRepositoryMock;
+        private Mock<ICatRepository> _catRepositoryMock;
         private UpdateCatByIdCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _catRepositoryMock = new Mock<IGenericRepository<Cat>>();
+            _catRepositoryMock = new Mock<ICatRepository>();
             _handler = new UpdateCatByIdCommandHandler(_catRepositoryMock.Object);
         }
 
@@ -36,7 +36,6 @@ namespace Test.CatTests.CommandTests
             Assert.That(result, Is.Not.Null);
             _catRepositoryMock.Verify(x => x.Update(It.Is<Cat>(d => d.Name == result.Name)), Times.Once);
             _catRepositoryMock.Verify(x => x.Update(It.Is<Cat>(d => d.Id == result.Id)), Times.Once);
-            _catRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
 
         [Test]
@@ -55,7 +54,6 @@ namespace Test.CatTests.CommandTests
             Assert.That(result, Is.Null);
             _catRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
             _catRepositoryMock.Verify(x => x.Update(It.IsAny<Cat>()), Times.Never);
-            _catRepositoryMock.Verify(x => x.Save(), Times.Never);
         }
     }
 }

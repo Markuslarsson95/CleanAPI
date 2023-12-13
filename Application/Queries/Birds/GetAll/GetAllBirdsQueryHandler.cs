@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Queries.Birds.GetAll
 {
     public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, List<Bird>>
     {
-        private readonly IGenericRepository<Bird> _birdRepository;
+        private readonly IBirdRepository _birdRepository;
 
-        public GetAllBirdsQueryHandler(IGenericRepository<Bird> birdRepository)
+        public GetAllBirdsQueryHandler(IBirdRepository birdRepository)
         {
             _birdRepository = birdRepository;
         }

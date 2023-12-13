@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Birds
 {
     public class DeleteBirdByIdCommandHandler : IRequestHandler<DeleteBirdByIdCommand, Bird>
     {
-        private readonly IGenericRepository<Bird> _birdRepository;
+        private readonly IBirdRepository _birdRepository;
 
-        public DeleteBirdByIdCommandHandler(IGenericRepository<Bird> birdRepository)
+        public DeleteBirdByIdCommandHandler(IBirdRepository birdRepository)
         {
             _birdRepository = birdRepository;
         }
@@ -21,8 +21,6 @@ namespace Application.Commands.Birds
                 return await Task.FromResult<Bird>(null!);
 
             await _birdRepository.Delete(birdToDelete);
-
-            _birdRepository.Save();
 
             return birdToDelete;
         }

@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Cats
 {
     public class DeleteCatByIdCommandHandler : IRequestHandler<DeleteCatByIdCommand, Cat>
     {
-        private readonly IGenericRepository<Cat> _catRepository;
+        private readonly ICatRepository _catRepository;
 
-        public DeleteCatByIdCommandHandler(IGenericRepository<Cat> catRepository)
+        public DeleteCatByIdCommandHandler(ICatRepository catRepository)
         {
             _catRepository = catRepository;
         }
@@ -21,8 +21,6 @@ namespace Application.Commands.Cats
                 return await Task.FromResult<Cat>(null!);
 
             await _catRepository.Delete(catToDelete);
-
-            _catRepository.Save();
 
             return catToDelete;
         }

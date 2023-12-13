@@ -1,13 +1,13 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
 using FluentValidation;
+using Infrastructure.Repositories;
 
 namespace Application.Commands.Users.AddUser
 {
     public class AddUserCommandValidator : AbstractValidator<AddUserCommand>
     {
-        private readonly IGenericRepository<User> _userRepository;
-        public AddUserCommandValidator(IGenericRepository<User> userRepository)
+        private readonly IUserRepository _userRepository;
+        public AddUserCommandValidator(IUserRepository userRepository)
         {
             _userRepository = userRepository;
 
