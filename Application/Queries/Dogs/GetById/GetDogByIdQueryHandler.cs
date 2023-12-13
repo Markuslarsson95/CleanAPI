@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Queries.Dogs.GetById
 {
     public class GetDogByIdQueryHandler : IRequestHandler<GetDogByIdQuery, Dog>
     {
-        private readonly IGenericRepository<Dog> _dogRepository;
+        private readonly IDogRepository _dogRepository;
 
-        public GetDogByIdQueryHandler(IGenericRepository<Dog> dogRepository)
+        public GetDogByIdQueryHandler(IDogRepository dogRepository)
         {
             _dogRepository = dogRepository;
         }

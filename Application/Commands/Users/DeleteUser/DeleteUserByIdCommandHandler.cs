@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Users.DeleteUser
 {
     public sealed class DeleteUserByIdCommandHandler : IRequestHandler<DeleteUserByIdCommand, User>
     {
-        private readonly IGenericRepository<User> _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public DeleteUserByIdCommandHandler(IGenericRepository<User> userRepository)
+        public DeleteUserByIdCommandHandler(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -21,8 +21,6 @@ namespace Application.Commands.Users.DeleteUser
                 return await Task.FromResult<User>(null!);
 
             await _userRepository.Delete(userToDelete);
-
-            _userRepository.Save();
 
             return userToDelete;
         }

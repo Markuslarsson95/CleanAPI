@@ -1,4 +1,4 @@
-﻿using Domain.Repositories;
+﻿using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Users.LoginUser

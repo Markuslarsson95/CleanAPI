@@ -1,16 +1,16 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Users.AddUser
 {
     public sealed class AddUserCommandHandler : IRequestHandler<AddUserCommand, User>
     {
-        private readonly IGenericRepository<User> _genericUserRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AddUserCommandHandler(IGenericRepository<User> genericUserRepository)
+        public AddUserCommandHandler(IUserRepository userRepository)
         {
-            _genericUserRepository = genericUserRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<User> Handle(AddUserCommand request, CancellationToken cancellationToken)
@@ -20,9 +20,7 @@ namespace Application.Commands.Users.AddUser
                 UserName = request.NewUser.UserName,
                 Password = request.NewUser.Password
             };
-            await _genericUserRepository.Add(userToCreate);
-
-            _genericUserRepository.Save();
+            await _userRepository.Add(userToCreate);
 
             return await Task.FromResult(userToCreate);
         }

@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Cats
 {
     public class UpdateCatByIdCommandHandler : IRequestHandler<UpdateCatByIdCommand, Cat>
     {
-        private readonly IGenericRepository<Cat> _catRepository;
+        private readonly ICatRepository _catRepository;
 
-        public UpdateCatByIdCommandHandler(IGenericRepository<Cat> catRepository)
+        public UpdateCatByIdCommandHandler(ICatRepository catRepository)
         {
             _catRepository = catRepository;
         }
@@ -21,9 +21,9 @@ namespace Application.Commands.Cats
 
             catToUpdate.Name = request.UpdatedCat.Name;
             catToUpdate.LikesToPlay = request.UpdatedCat.LikesToPlay;
+            catToUpdate.Breed = request.UpdatedCat.Breed;
+            catToUpdate.Weight = request.UpdatedCat.Weight;
             await _catRepository.Update(catToUpdate);
-
-            _catRepository.Save();
 
             return catToUpdate;
         }

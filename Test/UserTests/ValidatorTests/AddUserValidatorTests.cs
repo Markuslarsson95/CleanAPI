@@ -13,7 +13,7 @@
 //        [TestFixture]
 //        public class AddUserValidatorTests
 //        {
-//            private Mock<IGenericRepository<User>> _userRepositoryMock;
+//            private Mock<IUserRepository> _userRepositoryMock;
 //            private AddUserCommandValidator _validator;
 //            private Mock<AddUserCommandValidator> _validatorMock;
 
@@ -21,7 +21,7 @@
 //            public void SetUp()
 //            {
 //                _userRepositoryMock.Setup(x => x.Add(It.IsAny<User>()));
-//                _userRepositoryMock = new Mock<IGenericRepository<User>>();
+//                _userRepositoryMock = new Mock<IUserRepository>();
 //                _validator = new AddUserCommandValidator(_userRepositoryMock.Object);
 //                _validatorMock = new Mock<AddUserCommandValidator>();
 //            }

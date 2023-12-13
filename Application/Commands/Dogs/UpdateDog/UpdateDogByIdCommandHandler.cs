@@ -1,14 +1,14 @@
 ﻿using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.Commands.Dogs.UpdateDog
 {
     public class UpdateDogByIdCommandHandler : IRequestHandler<UpdateDogByIdCommand, Dog>
     {
-        private readonly IGenericRepository<Dog> _dogRepository;
+        private readonly IDogRepository _dogRepository;
 
-        public UpdateDogByIdCommandHandler(IGenericRepository<Dog> dogRepository)
+        public UpdateDogByIdCommandHandler(IDogRepository dogRepository)
         {
             _dogRepository = dogRepository;
         }
@@ -20,9 +20,9 @@ namespace Application.Commands.Dogs.UpdateDog
                 return await Task.FromResult<Dog>(null!);
 
             dogToUpdate.Name = request.UpdatedDog.Name;
+            dogToUpdate.Weight = request.UpdatedDog.Weight;
+            dogToUpdate.Breed = request.UpdatedDog.Breed;
             await _dogRepository.Update(dogToUpdate);
-
-            _dogRepository.Save();
 
             return dogToUpdate;
         }

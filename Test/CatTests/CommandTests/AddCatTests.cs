@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Cats;
 using Application.Dtos;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.CatTests.CommandTests
@@ -9,14 +9,14 @@ namespace Test.CatTests.CommandTests
     [TestFixture]
     public class AddCatTests
     {
-        private Mock<IGenericRepository<Cat>> _catRepositoryMock;
+        private Mock<ICatRepository> _catRepositoryMock;
         private AddCatCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _catRepositoryMock = new Mock<IGenericRepository<Cat>>();
+            _catRepositoryMock = new Mock<ICatRepository>();
             _handler = new AddCatCommandHandler(_catRepositoryMock.Object);
         }
 
@@ -35,7 +35,6 @@ namespace Test.CatTests.CommandTests
             // Assert
             Assert.That(result, Is.Not.Null);
             _catRepositoryMock.Verify(x => x.Add(It.Is<Cat>(d => d.Id == result.Id)), Times.Once);
-            _catRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
     }
 }

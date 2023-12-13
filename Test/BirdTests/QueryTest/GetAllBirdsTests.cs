@@ -1,6 +1,6 @@
 ﻿using Application.Queries.Birds.GetAll;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.BirdTests.QueryTest
@@ -8,14 +8,14 @@ namespace Test.BirdTests.QueryTest
     [TestFixture]
     public class GetAllBirdsTests
     {
-        private Mock<IGenericRepository<Bird>> _birdRepositoryMock;
+        private Mock<IBirdRepository> _birdRepositoryMock;
         private GetAllBirdsQueryHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
-            _birdRepositoryMock = new Mock<IGenericRepository<Bird>>();
+            _birdRepositoryMock = new Mock<IBirdRepository>();
             _handler = new GetAllBirdsQueryHandler(_birdRepositoryMock.Object);
         }
 

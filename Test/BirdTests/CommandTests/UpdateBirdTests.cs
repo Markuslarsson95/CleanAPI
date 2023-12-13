@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Birds;
 using Application.Dtos;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.BirdTests.CommandTests
@@ -9,14 +9,14 @@ namespace Test.BirdTests.CommandTests
     [TestFixture]
     public class UpdateBirdTests
     {
-        private Mock<IGenericRepository<Bird>> _birdRepositoryMock;
+        private Mock<IBirdRepository> _birdRepositoryMock;
         private UpdateBirdByIdCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _birdRepositoryMock = new Mock<IGenericRepository<Bird>>();
+            _birdRepositoryMock = new Mock<IBirdRepository>();
             _handler = new UpdateBirdByIdCommandHandler(_birdRepositoryMock.Object);
         }
 
@@ -36,7 +36,6 @@ namespace Test.BirdTests.CommandTests
             Assert.That(result, Is.Not.Null);
             _birdRepositoryMock.Verify(x => x.Update(It.Is<Bird>(d => d.Name == result.Name)), Times.Once);
             _birdRepositoryMock.Verify(x => x.Update(It.Is<Bird>(d => d.Id == result.Id)), Times.Once);
-            _birdRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
 
         [Test]
@@ -55,7 +54,6 @@ namespace Test.BirdTests.CommandTests
             Assert.That(result, Is.Null);
             _birdRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
             _birdRepositoryMock.Verify(x => x.Update(It.IsAny<Bird>()), Times.Never);
-            _birdRepositoryMock.Verify(x => x.Save(), Times.Never);
         }
     }
 }

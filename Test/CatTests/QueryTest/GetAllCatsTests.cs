@@ -1,6 +1,6 @@
 ﻿using Application.Queries.Cats.GetAll;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.catTests.QueryTest
@@ -8,14 +8,14 @@ namespace Test.catTests.QueryTest
     [TestFixture]
     public class GetAllCatsTests
     {
-        private Mock<IGenericRepository<Cat>> _catRepositoryMock;
+        private Mock<ICatRepository> _catRepositoryMock;
         private GetAllCatsQueryHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
-            _catRepositoryMock = new Mock<IGenericRepository<Cat>>();
+            _catRepositoryMock = new Mock<ICatRepository>();
             _handler = new GetAllCatsQueryHandler(_catRepositoryMock.Object);
         }
 

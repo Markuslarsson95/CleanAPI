@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Dogs;
 using Application.Dtos;
 using Domain.Models;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using Moq;
 
 namespace Test.DogTests.CommandTests
@@ -9,13 +9,13 @@ namespace Test.DogTests.CommandTests
     [TestFixture]
     public class AddDogTests
     {
-        private Mock<IGenericRepository<Dog>> _dogRepositoryMock;
+        private Mock<IDogRepository> _dogRepositoryMock;
         private AddDogCommandHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
-            _dogRepositoryMock = new Mock<IGenericRepository<Dog>>();
+            _dogRepositoryMock = new Mock<IDogRepository>();
             _handler = new AddDogCommandHandler(_dogRepositoryMock.Object);
         }
 
@@ -34,7 +34,6 @@ namespace Test.DogTests.CommandTests
             // Assert
             Assert.That(result, Is.Not.Null);
             _dogRepositoryMock.Verify(x => x.Add(It.Is<Dog>(d => d.Id == result.Id)), Times.Once);
-            _dogRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
     }
 }
