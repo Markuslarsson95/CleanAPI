@@ -1,5 +1,5 @@
 ﻿using Application.Commands.Cats;
-using Domain.Models;
+using Domain.Models.Animal;
 using Infrastructure.Repositories;
 using Moq;
 

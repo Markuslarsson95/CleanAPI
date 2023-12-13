@@ -1,5 +1,5 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
-using Domain.Models;
+using Domain.Models.Animal;
 using Infrastructure.Repositories;
 using Moq;
 

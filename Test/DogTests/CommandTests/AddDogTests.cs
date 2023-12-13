@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Dogs;
 using Application.Dtos;
-using Domain.Models;
+using Domain.Models.Animal;
 using Infrastructure.Repositories;
 using Moq;
 

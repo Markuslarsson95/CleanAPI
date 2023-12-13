@@ -1,8 +1,6 @@
-﻿using Domain.Models.Animal;
-
-namespace Domain.Models
+﻿namespace Domain.Models.Animal
 {
-    public class Bird : AnimalModel
+    public class Bird : Animal
     {
         public bool CanFly { get; set; }
         public string Color { get; set; }
