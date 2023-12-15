@@ -1,5 +1,5 @@
 ﻿using Application.Queries.Dogs.GetById;
-using Domain.Models;
+using Domain.Models.Animals;
 using Infrastructure.Repositories;
 using Moq;
 

@@ -4,12 +4,11 @@ using Application.Queries.Users.GetAll;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Application.Commands.Users.UpdateUser;
-using FluentValidation;
 using Application.Commands.Users.DeleteUser;
+using Application.Validators.UserValidators;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,10 +19,14 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         internal readonly IMediator _mediator;
+        internal readonly UserCreateValidator _userCreateValidator;
+        internal readonly UserValidator _userValidator;
 
-        public UserController(IMediator mediator)
+        public UserController(IMediator mediator, UserCreateValidator userCreateValidator, UserValidator userValidator)
         {
             _mediator = mediator;
+            _userCreateValidator = userCreateValidator;
+            _userValidator = userValidator;
         }
 
         // Get all users from database
@@ -33,12 +36,14 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllUsers()
         {
-            var userList = await _mediator.Send(new GetAllUsersQuery());
-
-            if (userList.IsNullOrEmpty())
-                return NotFound("No users found");
-
-            return Ok(userList);
+            try
+            {
+                return Ok(await _mediator.Send(new GetAllUsersQuery()));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Get a User by Id
@@ -48,12 +53,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            var getUserResult = await _mediator.Send(new GetUserByIdQuery(userId));
+            try
+            {
+                var getUserResult = await _mediator.Send(new GetUserByIdQuery(userId));
 
-            if (getUserResult == null)
-                return NotFound($"User with ID {userId} not found");
+                if (getUserResult == null)
+                    return NotFound($"User with ID {userId} not found");
 
-            return Ok(getUserResult);
+                return Ok(getUserResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Create a new user 
@@ -62,14 +74,12 @@ namespace API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddUser([FromBody] UserDto newUser, IValidator<AddUserCommand> validator)
+        public async Task<IActionResult> AddUser([FromBody] UserCreateDto newUser)
         {
-            var validatorResult = validator.Validate(new AddUserCommand(newUser));
+            var validatorResult = _userCreateValidator.Validate(newUser);
 
             if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.ToString());
-            }
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
 
             try
             {
@@ -88,20 +98,26 @@ namespace API.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserById([FromBody] UserDto updatedUser, Guid userId, IValidator<UpdateUserByIdCommand> validator)
+        public async Task<IActionResult> UpdateUserById([FromBody] UserDto updatedUser, Guid userId)
         {
-            var updateUserCommand = new UpdateUserByIdCommand(updatedUser, userId);
-            var validatorResult = validator.Validate(updateUserCommand);
+            var validatorResult = _userValidator.Validate(updatedUser);
 
             if (!validatorResult.IsValid)
-                return BadRequest(validatorResult.ToString());
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
 
-            var updatedUserResult = await _mediator.Send(updateUserCommand);
+            try
+            {
+                var updatedUserResult = await _mediator.Send(new UpdateUserByIdCommand(updatedUser, userId));
 
-            if (updatedUserResult == null)
-                return NotFound($"User with ID {userId} not found");
+                if (updatedUserResult == null)
+                    return NotFound($"User with ID {userId} not found");
 
-            return Ok(updatedUserResult);
+                return Ok(updatedUserResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Delete user by id
@@ -112,12 +128,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUserById(Guid userId)
         {
-            var userToDelete = await _mediator.Send(new DeleteUserByIdCommand(userId));
+            try
+            {
+                var userToDelete = await _mediator.Send(new DeleteUserByIdCommand(userId));
 
-            if (userToDelete == null)
-                return NotFound($"User with ID {userId} not found");
+                if (userToDelete == null)
+                    return NotFound($"User with ID {userId} not found");
 
-            return Ok(userToDelete);
+                return Ok(userToDelete);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

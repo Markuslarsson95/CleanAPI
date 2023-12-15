@@ -22,109 +22,28 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Models.Bird", b =>
+            modelBuilder.Entity("AnimalUser", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("AnimalsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("CanFly")
-                        .HasColumnType("bit");
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("AnimalsId", "UsersId");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("UsersId");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Birds");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("45a3614d-c01a-4459-877f-2d0f7e957474"),
-                            CanFly = true,
-                            Color = "Blue",
-                            Name = "Peppe"
-                        },
-                        new
-                        {
-                            Id = new Guid("e8875b12-0630-4914-bcec-eb23a1cfb955"),
-                            CanFly = true,
-                            Color = "Yellow",
-                            Name = "Charlie"
-                        },
-                        new
-                        {
-                            Id = new Guid("db514d81-ab5e-4501-9d1d-8cf3fc478ec1"),
-                            CanFly = false,
-                            Color = "Green",
-                            Name = "Kiwi"
-                        });
+                    b.ToTable("AnimalUser");
                 });
 
-            modelBuilder.Entity("Domain.Models.Cat", b =>
+            modelBuilder.Entity("Domain.Models.Animals.Animal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Breed")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LikesToPlay")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Weight")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cats");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("abf7d09f-42d5-466f-adb6-fdb79cced91d"),
-                            Breed = "British Shorthair",
-                            LikesToPlay = true,
-                            Name = "Kajsa",
-                            Weight = 4
-                        },
-                        new
-                        {
-                            Id = new Guid("0293b60e-0eb4-414b-a362-829338a1427b"),
-                            Breed = "Maine Coon",
-                            LikesToPlay = true,
-                            Name = "Sigge",
-                            Weight = 10
-                        },
-                        new
-                        {
-                            Id = new Guid("58749c2d-3655-40a1-a93f-547ef1a0a1c5"),
-                            Breed = "Ragdoll",
-                            LikesToPlay = true,
-                            Name = "Lisa",
-                            Weight = 8
-                        });
-                });
-
-            modelBuilder.Entity("Domain.Models.Dog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Breed")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -132,35 +51,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Weight")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Dogs");
+                    b.ToTable("Animal");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("709f6285-e943-4d02-a1e3-a4f48088c39b"),
-                            Breed = "English Bulldog",
-                            Name = "Boss",
-                            Weight = 30
-                        },
-                        new
-                        {
-                            Id = new Guid("39f670c9-b461-4c2c-8d2d-076bed02a58d"),
-                            Breed = "Bernese Mountain Dog",
-                            Name = "Luffsen",
-                            Weight = 60
-                        },
-                        new
-                        {
-                            Id = new Guid("1239796c-9907-40a9-b5cb-397617c5d4a3"),
-                            Breed = "Cocker Spaniel",
-                            Name = "Pim",
-                            Weight = 15
-                        });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Animal");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -184,16 +81,157 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("611c82b3-50ee-4f58-a74d-c6a6f5d9f9f3"),
+                            Id = new Guid("ff2b332b-4f48-49b0-bd9a-935b025bc73c"),
                             Password = "admin",
                             UserName = "admin"
                         },
                         new
                         {
-                            Id = new Guid("e0e7ddcf-55d2-458c-9b6d-7703aca30d8a"),
+                            Id = new Guid("c902017c-e795-40f2-bcc6-66d0119cd409"),
                             Password = "string",
                             UserName = "string"
                         });
+                });
+
+            modelBuilder.Entity("Domain.Models.Animals.Bird", b =>
+                {
+                    b.HasBaseType("Domain.Models.Animals.Animal");
+
+                    b.Property<bool>("CanFly")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Bird");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("22b2a917-8163-41a8-bc47-6f7c8e3e7cd4"),
+                            Name = "Peppe",
+                            CanFly = true,
+                            Color = "Blue"
+                        },
+                        new
+                        {
+                            Id = new Guid("6f41b38a-287e-4d62-a40c-be4c7850cb5a"),
+                            Name = "Charlie",
+                            CanFly = true,
+                            Color = "Yellow"
+                        },
+                        new
+                        {
+                            Id = new Guid("38f15cf8-9741-4473-bc87-64243c9d1c60"),
+                            Name = "Kiwi",
+                            CanFly = false,
+                            Color = "Green"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Models.Animals.Cat", b =>
+                {
+                    b.HasBaseType("Domain.Models.Animals.Animal");
+
+                    b.Property<string>("Breed")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LikesToPlay")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue("Cat");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1f476589-3da3-4309-b319-b4d6514beb8f"),
+                            Name = "Kajsa",
+                            Breed = "British Shorthair",
+                            LikesToPlay = true,
+                            Weight = 4
+                        },
+                        new
+                        {
+                            Id = new Guid("7c8687e8-646e-40e4-8317-564d5bc0a7da"),
+                            Name = "Sigge",
+                            Breed = "Maine Coon",
+                            LikesToPlay = true,
+                            Weight = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("9c5cfaa8-a48b-422a-bd62-3fa26ee71e07"),
+                            Name = "Lisa",
+                            Breed = "Ragdoll",
+                            LikesToPlay = true,
+                            Weight = 8
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Models.Animals.Dog", b =>
+                {
+                    b.HasBaseType("Domain.Models.Animals.Animal");
+
+                    b.Property<string>("Breed")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("int");
+
+                    b.ToTable("Animal", t =>
+                        {
+                            t.Property("Breed")
+                                .HasColumnName("Dog_Breed");
+
+                            t.Property("Weight")
+                                .HasColumnName("Dog_Weight");
+                        });
+
+                    b.HasDiscriminator().HasValue("Dog");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("076fbcea-d41c-4f95-bf0e-f9941d2b0019"),
+                            Name = "Boss",
+                            Breed = "English Bulldog",
+                            Weight = 30
+                        },
+                        new
+                        {
+                            Id = new Guid("0d912f5f-299e-4c64-9a83-7022179c5fe8"),
+                            Name = "Luffsen",
+                            Breed = "Bernese Mountain Dog",
+                            Weight = 60
+                        },
+                        new
+                        {
+                            Id = new Guid("63400f5d-0f1f-4693-add0-ceb3ab02dd55"),
+                            Name = "Pim",
+                            Breed = "Cocker Spaniel",
+                            Weight = 15
+                        });
+                });
+
+            modelBuilder.Entity("AnimalUser", b =>
+                {
+                    b.HasOne("Domain.Models.Animals.Animal", null)
+                        .WithMany()
+                        .HasForeignKey("AnimalsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

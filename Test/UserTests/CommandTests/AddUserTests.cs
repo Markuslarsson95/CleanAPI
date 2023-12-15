@@ -26,7 +26,7 @@ namespace Test.UserTests.CommandTests
         public async Task Handle_Should_AddNewUser_WhenValid()
         {
             // Arrange
-            var userCommand = new AddUserCommand(new UserDto { UserName = "User", Password = "Password" });
+            var userCommand = new AddUserCommand(new UserCreateDto { UserName = "User", Password = "Password", Birds = new List<BirdDto> { }, Cats = new List<CatDto> { }, Dogs = new List<DogDto> { } });
 
             // Act
             var result = await _handler.Handle(userCommand, default);

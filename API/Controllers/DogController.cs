@@ -6,10 +6,9 @@ using Application.Queries.Dogs.GetAll;
 using Application.Queries.Dogs.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
-using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
+using Domain.Models.Animals;
+using Application.Validators.DogValidators;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,9 +19,11 @@ namespace API.Controllers
     public class DogController : ControllerBase
     {
         internal readonly IMediator _mediator;
-        public DogController(IMediator mediator)
+        internal readonly DogValidator _dogValidator;
+        public DogController(IMediator mediator, DogValidator dogValidator)
         {
             _mediator = mediator;
+            _dogValidator = dogValidator;
         }
 
         // Get all dogs from database
@@ -32,12 +33,14 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllDogs()
         {
-            var dogList = await _mediator.Send(new GetAllDogsQuery());
-
-            if (dogList.IsNullOrEmpty())
-                return NotFound("No dogs found");
-
-            return Ok(dogList);
+            try
+            {
+                return Ok(await _mediator.Send(new GetAllDogsQuery()));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Get a dog by Id
@@ -47,12 +50,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDogById(Guid dogId)
         {
-            var getDogResult = await _mediator.Send(new GetDogByIdQuery(dogId));
+            try
+            {
+                var getDogResult = await _mediator.Send(new GetDogByIdQuery(dogId));
 
-            if (getDogResult == null)
-                return NotFound($"Dog with ID {dogId} not found");
+                if (getDogResult == null)
+                    return NotFound($"Dog with ID {dogId} not found");
 
-            return Ok(getDogResult);
+                return Ok(getDogResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Create a new dog 
@@ -61,22 +71,22 @@ namespace API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddDog([FromBody] DogDto newDog, IValidator<AddDogCommand> validator)
+        public async Task<IActionResult> AddDog([FromBody] DogDto newDog)
         {
-            var validatorResult = validator.Validate(new AddDogCommand(newDog));
+            var validatorResult = _dogValidator.Validate(newDog);
 
             if (!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.ToString());
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
             }
 
             try
             {
                 return Ok(await _mediator.Send(new AddDogCommand(newDog)));
             }
-            catch (Exception ex)
+            catch (ArgumentException e)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(e.Message);
             }
         }
 
@@ -87,20 +97,26 @@ namespace API.Controllers
         [ProducesResponseType(typeof(Dog), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId, IValidator<UpdateDogByIdCommand> validator)
+        public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId)
         {
-            var updateDogCommand = new UpdateDogByIdCommand(updatedDog, dogId);
-            var updatedDogResult = await _mediator.Send(updateDogCommand);
-
-            if (updatedDogResult == null)
-                return NotFound($"Dog with ID {dogId} not found");
-
-            var validatorResult = await validator.ValidateAsync(updateDogCommand);
+            var validatorResult = _dogValidator.Validate(updatedDog);
 
             if (!validatorResult.IsValid)
                 return ValidationProblem(validatorResult.ToString());
 
-            return Ok(updatedDogResult);
+            try
+            {
+                var updatedDogResult = await _mediator.Send(new UpdateDogByIdCommand(updatedDog, dogId));
+
+                if (updatedDogResult == null)
+                    return NotFound($"Dog with ID {dogId} not found");
+
+                return Ok(updatedDogResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Delete dog by id
@@ -111,13 +127,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDogById(Guid dogId)
         {
-            var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
+            try
+            {
+                var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
 
-            if (dogToDelete == null)
-                return NotFound($"Dog with ID {dogId} not found");
+                if (dogToDelete == null)
+                    return NotFound($"Dog with ID {dogId} not found");
 
-            return Ok(dogToDelete);
+                return Ok(dogToDelete);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
-
     }
 }
