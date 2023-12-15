@@ -2,8 +2,8 @@
 using Application.Dtos;
 using Application.Queries.Birds;
 using Application.Queries.Birds.GetAll;
+using Application.Validators.BirdValidators;
 using Domain.Models.Animals;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +17,12 @@ namespace API.Controllers
     public class BirdController : ControllerBase
     {
         internal readonly IMediator _mediator;
+        internal readonly BirdValidator _birdValidator;
 
-        public BirdController(IMediator mediator)
+        public BirdController(IMediator mediator, BirdValidator birdValidator)
         {
             _mediator = mediator;
+            _birdValidator = birdValidator;
         }
 
         // Get all birds from database
@@ -29,7 +31,14 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Bird>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllBirds()
         {
-            return Ok(await _mediator.Send(new GetAllBirdsQuery()));
+            try
+            {
+                return Ok(await _mediator.Send(new GetAllBirdsQuery()));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Get a bird by Id
@@ -39,12 +48,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetBirdById(Guid birdId)
         {
-            var getBirdResult = await _mediator.Send(new GetBirdByIdQuery(birdId));
+            try
+            {
+                var getBirdResult = await _mediator.Send(new GetBirdByIdQuery(birdId));
 
-            if (getBirdResult == null)
-                return NotFound($"Bird with ID {birdId} not found");
+                if (getBirdResult == null)
+                    return NotFound($"Bird with ID {birdId} not found");
 
-            return Ok(getBirdResult);
+                return Ok(getBirdResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Create a new bird 
@@ -53,20 +69,23 @@ namespace API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(Bird), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddBird([FromBody] BirdDto newBird, IValidator<AddBirdCommand> validator)
+        public async Task<IActionResult> AddBird([FromBody] BirdDto newBird)
         {
-            var addBirdCommand = new AddBirdCommand(newBird);
-
-            var validatorResult = await validator.ValidateAsync(addBirdCommand);
+            var validatorResult = _birdValidator.Validate(newBird);
 
             if (!validatorResult.IsValid)
             {
-                return ValidationProblem(validatorResult.ToString());
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
             }
 
-            await _mediator.Send(addBirdCommand);
-
-            return Ok(addBirdCommand);
+            try
+            {
+                return Ok(await _mediator.Send(new AddBirdCommand(newBird)));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Update a specific bird
@@ -76,20 +95,28 @@ namespace API.Controllers
         [ProducesResponseType(typeof(Bird), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateBirdById([FromBody] BirdDto updatedBird, Guid birdId, IValidator<UpdateBirdByIdCommand> validator)
+        public async Task<IActionResult> UpdateBirdById([FromBody] BirdDto updatedBird, Guid birdId)
         {
-            var updateBirdCommand = new UpdateBirdByIdCommand(updatedBird, birdId);
-            var updatedBirdResult = await _mediator.Send(updateBirdCommand);
-
-            if (updatedBirdResult == null)
-                return NotFound($"Bird with ID {birdId} not found");
-
-            var validatorResult = await validator.ValidateAsync(updateBirdCommand);
+            var validatorResult = _birdValidator.Validate(updatedBird);
 
             if (!validatorResult.IsValid)
-                return ValidationProblem(validatorResult.ToString());
+            {
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
+            }
 
-            return Ok(updateBirdCommand);
+            try
+            {
+                var updatedBirdResult = await _mediator.Send(new UpdateBirdByIdCommand(updatedBird, birdId));
+
+                if (updatedBirdResult == null)
+                    return NotFound($"Bird with ID {birdId} not found");
+
+                return Ok(updatedBirdResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Delete bird by id
@@ -100,12 +127,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBirdById(Guid birdId)
         {
-            var birdToDelete = await _mediator.Send(new DeleteBirdByIdCommand(birdId));
+            try
+            {
+                var birdToDelete = await _mediator.Send(new DeleteBirdByIdCommand(birdId));
 
-            if (birdToDelete == null)
-                return NotFound($"Bird with ID {birdId} not found");
+                if (birdToDelete == null)
+                    return NotFound($"Bird with ID {birdId} not found");
 
-            return Ok(birdToDelete);
+                return Ok(birdToDelete);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

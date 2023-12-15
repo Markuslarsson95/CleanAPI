@@ -14,6 +14,7 @@ namespace Infrastructure
             services.AddScoped<IBirdRepository, BirdRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ILoginRepository, LoginRepository>();
+            services.AddScoped(typeof(IAnimalRepository<>), typeof(AnimalRepository<>));
             services.AddSingleton<MockDatabase>();
             services.AddDbContext<MySqlDB>();
 

@@ -2,8 +2,8 @@
 using Application.Dtos;
 using Application.Queries.Cats.GetAll;
 using Application.Queries.Cats.GetById;
+using Application.Validators.CatValidators;
 using Domain.Models.Animals;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +17,12 @@ namespace API.Controllers
     public class CatController : ControllerBase
     {
         internal readonly IMediator _mediator;
+        internal readonly CatValidator _catValidator;
 
-        public CatController(IMediator mediator)
+        public CatController(IMediator mediator, CatValidator catValidator)
         {
             _mediator = mediator;
+            _catValidator = catValidator;
         }
 
         // Get all cats from database
@@ -29,7 +31,14 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Cat>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllCats()
         {
-            return Ok(await _mediator.Send(new GetAllCatsQuery()));
+            try
+            {
+                return Ok(await _mediator.Send(new GetAllCatsQuery()));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Get a cat by Id
@@ -39,12 +48,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCatById(Guid catId)
         {
-            var getCatResult = await _mediator.Send(new GetCatByIdQuery(catId));
+            try
+            {
+                var getCatResult = await _mediator.Send(new GetCatByIdQuery(catId));
 
-            if (getCatResult == null)
-                return NotFound($"Cat with ID {catId} not found");
+                if (getCatResult == null)
+                    return NotFound($"Cat with ID {catId} not found");
 
-            return Ok(getCatResult);
+                return Ok(getCatResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Create a new cat 
@@ -53,20 +69,23 @@ namespace API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddCat([FromBody] CatDto newCat, IValidator<AddCatCommand> validator)
+        public async Task<IActionResult> AddCat([FromBody] CatDto newCat)
         {
-            var addCatCommand = new AddCatCommand(newCat);
-
-            var validatorResult = await validator.ValidateAsync(addCatCommand);
+            var validatorResult = _catValidator.Validate(newCat);
 
             if (!validatorResult.IsValid)
             {
-                return ValidationProblem(validatorResult.ToString());
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
             }
 
-            await _mediator.Send(addCatCommand);
-
-            return Ok(addCatCommand);
+            try
+            {
+                return Ok(await _mediator.Send(new AddCatCommand(newCat)));
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Update a specific cat
@@ -76,20 +95,26 @@ namespace API.Controllers
         [ProducesResponseType(typeof(Cat), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateCatById([FromBody] CatDto updatedCat, Guid catId, IValidator<UpdateCatByIdCommand> validator)
+        public async Task<IActionResult> UpdateCatById([FromBody] CatDto updatedCat, Guid catId)
         {
-            var updateCatCommand = new UpdateCatByIdCommand(updatedCat, catId);
-            var updatedCatResult = await _mediator.Send(updateCatCommand);
-
-            if (updatedCatResult == null)
-                return NotFound($"Cat with ID {catId} not found");
-
-            var validatorResult = await validator.ValidateAsync(updateCatCommand);
+            var validatorResult = _catValidator.Validate(updatedCat);
 
             if (!validatorResult.IsValid)
-                return ValidationProblem(validatorResult.ToString());
+                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
 
-            return Ok(updateCatCommand);
+            try
+            {
+                var updatedCatResult = await _mediator.Send(new UpdateCatByIdCommand(updatedCat, catId));
+
+                if (updatedCatResult == null)
+                    return NotFound($"Cat with ID {catId} not found");
+
+                return Ok(updatedCatResult);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         // Delete cat by id
@@ -100,12 +125,19 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteCatById(Guid catId)
         {
-            var catToDelete = await _mediator.Send(new DeleteCatByIdCommand(catId));
+            try
+            {
+                var catToDelete = await _mediator.Send(new DeleteCatByIdCommand(catId));
 
-            if (catToDelete == null)
-                return NotFound($"Cat with ID {catId} not found");
+                if (catToDelete == null)
+                    return NotFound($"Cat with ID {catId} not found");
 
-            return Ok(catToDelete);
+                return Ok(catToDelete);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

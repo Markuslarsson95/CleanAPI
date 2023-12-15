@@ -1,9 +1,12 @@
-﻿namespace Domain.Models
+﻿using Domain.Models.Animals;
+
+namespace Domain.Models
 {
     public class User
     {
         public Guid Id { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public List<Animal> Animals { get; set; }
     }
 }

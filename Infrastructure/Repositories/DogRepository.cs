@@ -1,5 +1,7 @@
-﻿using Domain.Models.Animals;
+﻿using Domain.Models;
+using Domain.Models.Animals;
 using Infrastructure.RealDatabase;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -14,13 +16,17 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Dog>> GetAll()
         {
-            var dogList = _mySqlDb.Dogs.ToList();
+            var dogList = _mySqlDb.Dogs
+                .Include(x => x.Users)
+                .ToList();
             return await Task.FromResult(dogList);
         }
 
         public async Task<Dog?> GetById(Guid id)
         {
-            var dog = _mySqlDb.Dogs.Find(id);
+            var dog = _mySqlDb.Dogs
+                .Include(x => x.Users)
+                .FirstOrDefault(x => x.Id == id);
             return await Task.FromResult(dog);
         }
 
@@ -49,5 +55,7 @@ namespace Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+
+
     }
 }
