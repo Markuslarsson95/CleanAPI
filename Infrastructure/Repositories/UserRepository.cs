@@ -1,5 +1,4 @@
 ﻿using Domain.Models;
-using Domain.Models.Animals;
 using Infrastructure.RealDatabase;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,10 +15,17 @@ namespace Infrastructure.Repositories
 
         public async Task<List<User>> GetAll()
         {
-            var userList = _mySqlDb.Users
-                .Include(x => x.Animals)
-                .ToList();
-            return await Task.FromResult(userList);
+            try
+            {
+                IQueryable<User> query = _mySqlDb.Users.Include(x => x.Animals).OrderBy(x => x.UserName);
+
+                var userList = await query.ToListAsync();
+                return userList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occured while getting user list from the database", ex);
+            }
         }
 
         public async Task<User?> GetById(Guid id)
@@ -50,17 +56,5 @@ namespace Infrastructure.Repositories
             _mySqlDb.SaveChanges();
             return await Task.FromResult(user);
         }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
-        }
-        //public bool BeUniqueUsername(string username)
-        //{
-        //    // Check if the username is unique in the database
-        //    List<User> allUsersFromDb = _repository.GetAll().Result;
-
-        //    return !allUsersFromDb.Any(user => user.UserName.ToLower() == username.ToLower());
-        //}
     }
 }

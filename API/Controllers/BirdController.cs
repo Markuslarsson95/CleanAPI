@@ -29,11 +29,11 @@ namespace API.Controllers
         [HttpGet]
         [Route("getAllBirds")]
         [ProducesResponseType(typeof(List<Bird>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllBirds()
+        public async Task<IActionResult> GetAllBirds(string? sortByColor = null)
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAllBirdsQuery()));
+                return Ok(await _mediator.Send(new GetAllBirdsQuery(sortByColor)));
             }
             catch (ArgumentException e)
             {

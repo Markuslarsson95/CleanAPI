@@ -14,7 +14,7 @@ namespace Application.Queries.Birds.GetAll
         }
         public Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
         {
-            var birdList = _birdRepository.GetAll();
+            var birdList = _birdRepository.GetAll(request.SortyByColor);
 
             return birdList;
         }

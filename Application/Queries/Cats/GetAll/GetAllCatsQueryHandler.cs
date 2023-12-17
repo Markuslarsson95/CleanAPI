@@ -14,7 +14,7 @@ namespace Application.Queries.Cats.GetAll
         }
         public Task<List<Cat>> Handle(GetAllCatsQuery request, CancellationToken cancellationToken)
         {
-            var catList = _catRepository.GetAll();
+            var catList = _catRepository.GetAll(request.SortyByBreed, request.SortByWeight);
 
             return catList;
         }

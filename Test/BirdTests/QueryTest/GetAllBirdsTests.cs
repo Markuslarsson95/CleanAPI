@@ -14,7 +14,6 @@ namespace Test.BirdTests.QueryTest
         [SetUp]
         public void SetUp()
         {
-            // Initialize the handler and mock database before each test
             _birdRepositoryMock = new Mock<IBirdRepository>();
             _handler = new GetAllBirdsQueryHandler(_birdRepositoryMock.Object);
         }
@@ -23,15 +22,43 @@ namespace Test.BirdTests.QueryTest
         public async Task Handle_Should_ReturnBirdList()
         {
             // Arrange
-            var query = new GetAllBirdsQuery();
-            _birdRepositoryMock.Setup(x => x.GetAll()).ReturnsAsync(new List<Bird>());
+            var query = new GetAllBirdsQuery(sortyByColor: "Blue");
+            var expectedBirds = new List<Bird>
+            {
+                new Bird { Id = Guid.NewGuid(), Color = "Blue", Name = "Bluebird" },
+                new Bird { Id = Guid.NewGuid(), Color = "Blue", Name = "Blue Jay" }
+            };
+
+            _birdRepositoryMock.Setup(x => x.GetAll("Blue")).ReturnsAsync(expectedBirds);
 
             // Act
             var result = await _handler.Handle(query, default);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            _birdRepositoryMock.Verify(x => x.GetAll(), Times.Once);
+            Assert.That(result, Is.EqualTo(expectedBirds));
+            _birdRepositoryMock.Verify(x => x.GetAll("Blue"), Times.Once);
+        }
+
+        [Test]
+        public async Task Handle_Should_ReturnEmptyBirdList_When_NoBirdWithCorrectColor()
+        {
+            // Arrange
+            var query = new GetAllBirdsQuery(sortyByColor: "Yellow");
+            var expectedBirds = new List<Bird>
+            {
+
+            };
+
+            _birdRepositoryMock.Setup(x => x.GetAll("Yellow")).ReturnsAsync(expectedBirds);
+
+            // Act
+            var result = await _handler.Handle(query, default);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+            Assert.That(result, Is.EqualTo(expectedBirds));
+            _birdRepositoryMock.Verify(x => x.GetAll("Yellow"), Times.Once);
         }
     }
 }

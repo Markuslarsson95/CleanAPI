@@ -31,11 +31,11 @@ namespace API.Controllers
         [Route("getAllDogs")]
         [ProducesResponseType(typeof(List<Dog>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAllDogs()
+        public async Task<IActionResult> GetAllDogs(string? sortByBreed = null, int? sortByWeight = null)
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAllDogsQuery()));
+                return Ok(await _mediator.Send(new GetAllDogsQuery(sortByBreed, sortByWeight)));
             }
             catch (ArgumentException e)
             {
