@@ -13,12 +13,24 @@ namespace Infrastructure.Repositories
             _mySqlDb = mySqlDb;
         }
 
-        public async Task<List<Bird>> GetAll()
+        public async Task<List<Bird>> GetAll(string? sortByColor)
         {
-            var birdList = _mySqlDb.Birds
-                .Include(x => x.Users)
-                .ToList();
-            return await Task.FromResult(birdList);
+            try
+            {
+                IQueryable<Bird> query = _mySqlDb.Birds.Include(x => x.Users).OrderByDescending(x => x.Name).ThenBy(x => x.Color);
+
+                if (!string.IsNullOrEmpty(sortByColor))
+                {
+                    query = query.Where(x => x.Color == sortByColor);
+                }
+
+                var birdList = await query.ToListAsync();
+                return birdList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occured while getting bird list from the database", ex);
+            }
         }
 
         public async Task<Bird?> GetById(Guid id)
@@ -48,11 +60,6 @@ namespace Infrastructure.Repositories
             _mySqlDb.Birds.Remove(bird);
             _mySqlDb.SaveChanges();
             return await Task.FromResult(bird);
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
         }
     }
 }

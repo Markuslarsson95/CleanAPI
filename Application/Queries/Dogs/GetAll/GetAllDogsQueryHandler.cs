@@ -15,7 +15,7 @@ namespace Application.Queries.Dogs
         }
         public Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            var dogList = _dogRepository.GetAll();
+            var dogList = _dogRepository.GetAll(request.SortyByBreed, request.SortByWeight);
 
             return dogList;
         }

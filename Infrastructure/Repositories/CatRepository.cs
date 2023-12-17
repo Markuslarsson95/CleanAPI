@@ -13,12 +13,30 @@ namespace Infrastructure.Repositories
             _mySqlDb = mySqlDb;
         }
 
-        public async Task<List<Cat>> GetAll()
+        public async Task<List<Cat>> GetAll(string? sortByBreed, int? sortByWeight)
         {
-            var catList = _mySqlDb.Cats
-                .Include(x => x.Users)
-                .ToList();
-            return await Task.FromResult(catList);
+            try
+            {
+                IQueryable<Cat> query = _mySqlDb.Cats.Include(x => x.Users).OrderBy(x => x.Name).ThenBy(x => x.Breed);
+
+                if (!string.IsNullOrEmpty(sortByBreed))
+                {
+                    query = query.Where(x => x.Breed == sortByBreed);
+                }
+
+                if (sortByWeight > 0)
+                {
+                    query = query.Where(x => x.Weight >= sortByWeight);
+                }
+
+                var catList = await query.ToListAsync();
+                return catList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error occured while getting cat list from the database", ex);
+            }
+
         }
 
         public async Task<Cat?> GetById(Guid id)
@@ -48,11 +66,6 @@ namespace Infrastructure.Repositories
             _mySqlDb.Cats.Remove(cat);
             _mySqlDb.SaveChanges();
             return await Task.FromResult(cat);
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
         }
     }
 }
