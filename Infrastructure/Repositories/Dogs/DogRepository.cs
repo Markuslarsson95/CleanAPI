@@ -7,11 +7,11 @@ namespace Infrastructure.Repositories.Dogs
 {
     public class DogRepository : IDogRepository
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
 
-        public DogRepository(MySqlDB mySqlDb)
+        public DogRepository(SqlDbContext sqlDbContext)
         {
-            _mySqlDb = mySqlDb;
+            _sqlDbContext = sqlDbContext;
         }
 
         public async Task<List<Dog>> GetAll(string? sortByBreed, int? sortByWeight)
@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories.Dogs
             {
                 Log.Information("Looking for Dogs in database");
 
-                IQueryable<Dog> query = _mySqlDb.Dogs.Include(x => x.Users).OrderBy(x => x.Name).ThenBy(x => x.Breed);
+                IQueryable<Dog> query = _sqlDbContext.Dogs.Include(x => x.Users).OrderBy(x => x.Name).ThenBy(x => x.Breed);
 
                 if (!string.IsNullOrEmpty(sortByBreed))
                 {
@@ -51,7 +51,7 @@ namespace Infrastructure.Repositories.Dogs
             {
                 Log.Information("Looking for Dog in database");
 
-                var dog = _mySqlDb.Dogs
+                var dog = _sqlDbContext.Dogs
                     .Include(x => x.Users)
                     .FirstOrDefault(x => x.Id == id);
 
@@ -70,8 +70,8 @@ namespace Infrastructure.Repositories.Dogs
             {
                 Log.Information("Adding a new dog to the database");
 
-                _mySqlDb.Dogs.Add(dog);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Dogs.Add(dog);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully added a new dog to the database");
 
@@ -90,8 +90,8 @@ namespace Infrastructure.Repositories.Dogs
             {
                 Log.Information("Updating dog in the database");
 
-                _mySqlDb.Dogs.Update(dog);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Dogs.Update(dog);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully updated dog in the database");
 
@@ -110,8 +110,8 @@ namespace Infrastructure.Repositories.Dogs
             {
                 Log.Information("Removing dog from the database");
 
-                _mySqlDb.Dogs.Remove(dog);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Dogs.Remove(dog);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully remove dog in the database");
                 return await Task.FromResult(dog);

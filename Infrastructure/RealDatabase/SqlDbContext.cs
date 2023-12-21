@@ -1,15 +1,16 @@
 ﻿using Domain.Models;
 using Domain.Models.Animals;
 using Infrastructure.DatabaseHelpers.DatabaseSeeder;
+using Infrastructure.Repositories.Password;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.RealDatabase
 {
-    public class MySqlDB : DbContext
+    public class SqlDbContext : DbContext
     {
-        public MySqlDB() { }
+        public SqlDbContext() { }
 
-        public MySqlDB(DbContextOptions<MySqlDB> options) : base(options) { }
+        public SqlDbContext(DbContextOptions<SqlDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Dog> Dogs { get; set; }
@@ -28,8 +29,10 @@ namespace Infrastructure.RealDatabase
         {
             base.OnModelCreating(modelBuilder);
 
-            // Call the SeedData method from the external class
-            DatabaseSeeder.SeedData(modelBuilder);
+            var passwordEncryptor = new PasswordEncryptor();
+            var seeder = new DatabaseSeeder(passwordEncryptor);
+
+            seeder.SeedData(modelBuilder);
         }
     }
 }

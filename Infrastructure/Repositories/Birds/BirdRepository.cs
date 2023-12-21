@@ -7,11 +7,11 @@ namespace Infrastructure.Repositories.Birds
 {
     public class BirdRepository : IBirdRepository
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
 
-        public BirdRepository(MySqlDB mySqlDb)
+        public BirdRepository(SqlDbContext sqlDbContext)
         {
-            _mySqlDb = mySqlDb;
+            _sqlDbContext = sqlDbContext;
         }
 
         public async Task<List<Bird>> GetAll(string? sortByColor)
@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories.Birds
             {
                 Log.Information("Looking for Birds in the database");
 
-                IQueryable<Bird> query = _mySqlDb.Birds.Include(x => x.Users).OrderByDescending(x => x.Name).ThenBy(x => x.Color);
+                IQueryable<Bird> query = _sqlDbContext.Birds.Include(x => x.Users).OrderByDescending(x => x.Name).ThenBy(x => x.Color);
 
                 if (!string.IsNullOrEmpty(sortByColor))
                 {
@@ -47,7 +47,7 @@ namespace Infrastructure.Repositories.Birds
             {
                 Log.Information($"Looking for Bird with ID {id} in the database");
 
-                var bird = _mySqlDb.Birds
+                var bird = _sqlDbContext.Birds
                     .Include(x => x.Users)
                     .FirstOrDefault(x => x.Id == id);
 
@@ -66,8 +66,8 @@ namespace Infrastructure.Repositories.Birds
             {
                 Log.Information("Adding a new Bird to the database");
 
-                _mySqlDb.Birds.Add(bird);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Birds.Add(bird);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully added a new Bird to the database");
 
@@ -86,8 +86,8 @@ namespace Infrastructure.Repositories.Birds
             {
                 Log.Information("Updating Bird in the database");
 
-                _mySqlDb.Birds.Update(bird);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Birds.Update(bird);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully updated Bird in the database");
 
@@ -106,8 +106,8 @@ namespace Infrastructure.Repositories.Birds
             {
                 Log.Information("Removing Bird from the database");
 
-                _mySqlDb.Birds.Remove(bird);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Birds.Remove(bird);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully removed Bird from the database");
 

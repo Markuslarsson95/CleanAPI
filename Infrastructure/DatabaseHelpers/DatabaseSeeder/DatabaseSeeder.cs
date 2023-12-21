@@ -1,24 +1,30 @@
 ﻿using Domain.Models;
 using Domain.Models.Animals;
+using Infrastructure.Repositories.Password;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DatabaseHelpers.DatabaseSeeder
 {
     public class DatabaseSeeder
     {
-        public static void SeedData(ModelBuilder modelBuilder)
+        private readonly IPasswordEncryptor _passwordEncryptor;
+
+        public DatabaseSeeder(IPasswordEncryptor passwordEncryptor)
         {
+            _passwordEncryptor = passwordEncryptor;
+        }
+        public void SeedData(ModelBuilder modelBuilder)
+        {
+            SeedUsers(modelBuilder);
             SeedDogs(modelBuilder);
             SeedCats(modelBuilder);
             SeedBirds(modelBuilder);
-            SeedUsers(modelBuilder);
-            // Add more methods for other entities as needed
         }
-        private static void SeedUsers(ModelBuilder modelBuilder)
+        private void SeedUsers(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasData(
-                new User { Id = Guid.NewGuid(), UserName = "admin", Password = "admin" },
-                new User { Id = Guid.NewGuid(), UserName = "string", Password = "string" }
+                new User { Id = Guid.NewGuid(), UserName = "admin", Password = _passwordEncryptor.Encrypt("admin") },
+                new User { Id = Guid.NewGuid(), UserName = "string", Password = _passwordEncryptor.Encrypt("string") }
             );
         }
         private static void SeedDogs(ModelBuilder modelBuilder)

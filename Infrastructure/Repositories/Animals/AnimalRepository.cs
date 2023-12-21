@@ -6,13 +6,13 @@ namespace Infrastructure.Repositories.Animals
 {
     public class AnimalRepository<T> : IAnimalRepository<T> where T : Animal
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
         private readonly DbSet<T> _dbSet;
 
-        public AnimalRepository(MySqlDB mySqlDb)
+        public AnimalRepository(SqlDbContext sqlDbContext)
         {
-            _mySqlDb = mySqlDb;
-            _dbSet = _mySqlDb.Set<T>();
+            _sqlDbContext = sqlDbContext; ;
+            _dbSet = _sqlDbContext.Set<T>();
         }
         public async Task<T> GetAnimalById(Guid id)
         {

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
-    [DbContext(typeof(MySqlDB))]
+    [DbContext(typeof(SqlDbContext))]
     partial class MySqlDBModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -81,14 +81,14 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ff2b332b-4f48-49b0-bd9a-935b025bc73c"),
-                            Password = "admin",
+                            Id = new Guid("16dfa628-e271-4e44-a468-776596ee3bf6"),
+                            Password = "$2a$11$B6eiS8e2OrTVWBbeiymNyud38t3pKNULLgjrIeIq4hVS9Oi6.vUiu",
                             UserName = "admin"
                         },
                         new
                         {
-                            Id = new Guid("c902017c-e795-40f2-bcc6-66d0119cd409"),
-                            Password = "string",
+                            Id = new Guid("0b4faff3-220b-458a-9b3c-6ccad4944a1e"),
+                            Password = "$2a$11$cX3VvrsJs99sF/4hIdzLS.djNcNgpSM1YJ3a85U7LyV/m0spVPqJC",
                             UserName = "string"
                         });
                 });
@@ -109,21 +109,21 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("22b2a917-8163-41a8-bc47-6f7c8e3e7cd4"),
+                            Id = new Guid("4ab87708-8db2-43a9-8a70-512a57fb7f28"),
                             Name = "Peppe",
                             CanFly = true,
                             Color = "Blue"
                         },
                         new
                         {
-                            Id = new Guid("6f41b38a-287e-4d62-a40c-be4c7850cb5a"),
+                            Id = new Guid("d6cb732d-a317-41ee-a7c9-c944b03aabc3"),
                             Name = "Charlie",
                             CanFly = true,
                             Color = "Yellow"
                         },
                         new
                         {
-                            Id = new Guid("38f15cf8-9741-4473-bc87-64243c9d1c60"),
+                            Id = new Guid("f50c5c81-756c-41f8-a53b-48a6017b0eff"),
                             Name = "Kiwi",
                             CanFly = false,
                             Color = "Green"
@@ -149,7 +149,7 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1f476589-3da3-4309-b319-b4d6514beb8f"),
+                            Id = new Guid("d0f80c75-bfa2-41b3-bfc5-79e72a0065fc"),
                             Name = "Kajsa",
                             Breed = "British Shorthair",
                             LikesToPlay = true,
@@ -157,7 +157,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7c8687e8-646e-40e4-8317-564d5bc0a7da"),
+                            Id = new Guid("b8f5937a-2579-4bd0-b786-23bed0ca5b97"),
                             Name = "Sigge",
                             Breed = "Maine Coon",
                             LikesToPlay = true,
@@ -165,7 +165,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9c5cfaa8-a48b-422a-bd62-3fa26ee71e07"),
+                            Id = new Guid("cae1346c-deef-4180-9aec-12ba98ea55ef"),
                             Name = "Lisa",
                             Breed = "Ragdoll",
                             LikesToPlay = true,
@@ -198,21 +198,21 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("076fbcea-d41c-4f95-bf0e-f9941d2b0019"),
+                            Id = new Guid("faf64302-6f53-4594-a436-fae4eb13e05f"),
                             Name = "Boss",
                             Breed = "English Bulldog",
                             Weight = 30
                         },
                         new
                         {
-                            Id = new Guid("0d912f5f-299e-4c64-9a83-7022179c5fe8"),
+                            Id = new Guid("e1dd04f3-e383-4423-882e-c0f4905a320a"),
                             Name = "Luffsen",
                             Breed = "Bernese Mountain Dog",
                             Weight = 60
                         },
                         new
                         {
-                            Id = new Guid("63400f5d-0f1f-4693-add0-ceb3ab02dd55"),
+                            Id = new Guid("07001207-f0ca-47f4-8f98-305825f64679"),
                             Name = "Pim",
                             Breed = "Cocker Spaniel",
                             Weight = 15
