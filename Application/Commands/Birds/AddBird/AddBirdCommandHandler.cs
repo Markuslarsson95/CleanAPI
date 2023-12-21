@@ -1,6 +1,7 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Birds
 {
@@ -15,16 +16,29 @@ namespace Application.Commands.Birds
 
         public async Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
         {
-            Bird birdToCreate = new()
+            try
             {
-                Id = Guid.NewGuid(),
-                Name = request.NewBird.Name,
-                CanFly = request.NewBird.CanFly,
-                Color = request.NewBird.Color
-            };
-            await _birdRepository.Add(birdToCreate);
+                Log.Information("Adding a new bird to the repository");
 
-            return birdToCreate;
+                Bird birdToCreate = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.NewBird.Name,
+                    CanFly = request.NewBird.CanFly,
+                    Color = request.NewBird.Color
+                };
+
+                await _birdRepository.Add(birdToCreate);
+
+                Log.Information("Successfully added a new bird to the repository");
+
+                return birdToCreate;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling AddBirdCommand");
+                throw new Exception("Error occurred while handling AddBirdCommand", ex);
+            }
         }
     }
 }

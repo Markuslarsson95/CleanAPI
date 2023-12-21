@@ -2,7 +2,8 @@
 using Application.Dtos;
 using Domain.Models;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Animals;
+using Infrastructure.Repositories.Users;
 using Moq;
 
 namespace Test.UserTests.CommandTests

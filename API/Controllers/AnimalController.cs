@@ -1,10 +1,14 @@
 ﻿using Application.Commands.Users.AddAnimalToUser;
 using Application.Commands.Users.RemoveAnimalFromUser;
 using Application.Dtos;
+using Application.Exceptions;
+using Application.Validators;
 using Domain.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers
 {
@@ -13,10 +17,12 @@ namespace API.Controllers
     public class AnimalController : ControllerBase
     {
         internal readonly IMediator _mediator;
+        internal readonly AnimalUserValidator _validator;
 
-        public AnimalController(IMediator mediator)
+        public AnimalController(IMediator mediator, AnimalUserValidator validator)
         {
             _mediator = mediator;
+            _validator = validator;
         }
 
         // Add animal to user 
@@ -24,22 +30,39 @@ namespace API.Controllers
         [Route("addAnimalToUser")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAnimalToUser([FromBody] AnimalUserDto animalToUserDto, IValidator<AnimalUserDto> validator)
+        public async Task<IActionResult> AddAnimalToUser([FromBody] AnimalUserDto animalUserDto)
         {
-            var validatorResult = validator.Validate(animalToUserDto);
-
-            if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
-            }
-
             try
             {
-                return Ok(await _mediator.Send(new AddAnimalToUserCommand(animalToUserDto)));
+                var validatorResult = _validator.Validate(animalUserDto);
+
+                if (!validatorResult.IsValid)
+                {
+                    Log.Warning("Validation of AnimalUserDto failed");
+                    var validationErrors = validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage);
+                    throw new ValidationErrorException(animalUserDto, validationErrors);
+                }
+
+                var command = await _mediator.Send(new AddAnimalToUserCommand(animalUserDto));
+
+                if (command == null)
+                {
+                    Log.Error("Animal or user not found");
+
+                    return BadRequest("Animal or user not found");
+                }
+
+                return Ok(command);
+            }
+            catch (ValidationErrorException ex)
+            {
+                Log.Error(ex, "Validation error when adding animal to user");
+                return BadRequest(ex.ValidationErrors);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                Log.Error(ex, "An unexpected error occurred while processing AddAnimalToUserCommand");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred");
             }
         }
 
@@ -48,22 +71,39 @@ namespace API.Controllers
         [Route("removeAnimalFromUser")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RemoveAnimalFromUser([FromBody] AnimalUserDto animalToUserDto, IValidator<AnimalUserDto> validator)
+        public async Task<IActionResult> RemoveAnimalFromUser([FromBody] AnimalUserDto animalUserDto)
         {
-            var validatorResult = validator.Validate(animalToUserDto);
-
-            if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
-            }
-
             try
             {
-                return Ok(await _mediator.Send(new RemoveAnimalFromUserCommand(animalToUserDto)));
+                var validatorResult = _validator.Validate(animalUserDto);
+
+                if (!validatorResult.IsValid)
+                {
+                    Log.Warning("Validation of AnimalUserDto failed");
+                    var validationErrors = validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage);
+                    throw new ValidationErrorException(animalUserDto, validationErrors);
+                }
+
+                var command = await _mediator.Send(new RemoveAnimalFromUserCommand(animalUserDto));
+
+                if (command == null)
+                {
+                    Log.Error("Animal or user not found");
+
+                    return BadRequest("Animal or user not found");
+                }
+
+                return Ok(command);
+            }
+            catch (ValidationErrorException ex)
+            {
+                Log.Error(ex, "Validation error when removing animal from user");
+                return BadRequest(ex.ValidationErrors);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                Log.Error(ex, "An unexpected error occurred while processing RemoveAnimalFromUserCommand");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred");
             }
         }
     }

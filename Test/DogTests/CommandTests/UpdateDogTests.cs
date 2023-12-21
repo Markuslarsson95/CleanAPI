@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Dogs.UpdateDog;
 using Application.Dtos;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dogs;
 using Moq;
 
 namespace Test.DogTests.CommandTests

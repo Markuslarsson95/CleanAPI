@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Birds;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Birds;
 using Moq;
 
 namespace Test.BirdTests.CommandTests

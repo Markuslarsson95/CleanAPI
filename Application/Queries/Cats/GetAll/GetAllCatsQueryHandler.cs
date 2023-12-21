@@ -1,6 +1,7 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Cats;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Cats.GetAll
 {
@@ -14,9 +15,21 @@ namespace Application.Queries.Cats.GetAll
         }
         public Task<List<Cat>> Handle(GetAllCatsQuery request, CancellationToken cancellationToken)
         {
-            var catList = _catRepository.GetAll(request.SortyByBreed, request.SortByWeight);
+            try
+            {
+                Log.Information("Fetching all cats from the repository");
 
-            return catList;
+                var catList = _catRepository.GetAll(request.SortyByBreed, request.SortByWeight);
+
+                Log.Information("Successfully retrieved all cats from the repository");
+
+                return catList;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while fetching all dogs from the repository");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

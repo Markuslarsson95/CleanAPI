@@ -1,6 +1,7 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Birds
 {
@@ -15,14 +16,28 @@ namespace Application.Commands.Birds
 
         public async Task<Bird> Handle(DeleteBirdByIdCommand request, CancellationToken cancellationToken)
         {
-            var birdToDelete = await _birdRepository.GetById(request.Id);
+            try
+            {
+                Log.Information($"Deleting bird with ID {request.Id}");
 
-            if (birdToDelete == null)
-                return await Task.FromResult<Bird>(null!);
+                var birdToDelete = await _birdRepository.GetById(request.Id);
 
-            await _birdRepository.Delete(birdToDelete);
+                if (birdToDelete == null)
+                {
+                    return await Task.FromResult<Bird>(null!);
+                }
 
-            return birdToDelete;
+                await _birdRepository.Delete(birdToDelete);
+
+                Log.Information("Successfully removed bird from the repository");
+
+                return birdToDelete;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An error occurred while handling DeleteBirdByIdCommand for bird with ID {request.Id}");
+                throw new Exception($"Error occurred while handling DeleteBirdByIdCommand for bird with ID {request.Id}", ex);
+            }
         }
     }
 }

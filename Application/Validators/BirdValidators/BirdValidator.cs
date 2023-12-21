@@ -7,11 +7,13 @@ namespace Application.Validators.BirdValidators
     {
         public BirdValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name can not be empty or null")
-                .MinimumLength(2).WithMessage("Name must be at least two characters long")
-                .MaximumLength(30).WithMessage("Name can not be more than 30 characters long");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Bird name can not be empty or null")
+                .MinimumLength(2).WithMessage("Bird name must be at least two characters long")
+                .MaximumLength(30).WithMessage("Bird name can not be more than 30 characters long");
             RuleFor(x => x.CanFly).NotNull().WithMessage("CanFly must be true or false");
-            RuleFor(x => x.Color).NotEmpty().WithMessage("Color can not be empty or null");
+            RuleFor(bird => bird.Color)
+            .NotEmpty().WithMessage("Bird color is required.")
+            .MaximumLength(30).WithMessage("Bird color must not exceed 30 characters");
         }
     }
 }

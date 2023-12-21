@@ -2,6 +2,7 @@ using Application;
 using Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -39,6 +40,11 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
     };
 });
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration).CreateLogger();
+
+builder.Host.UseSerilog();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

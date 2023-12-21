@@ -1,6 +1,6 @@
 ﻿using Domain.Models.Animals;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Repositories.Birds
 {
     public interface IBirdRepository
     {

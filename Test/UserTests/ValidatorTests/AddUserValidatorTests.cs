@@ -2,7 +2,7 @@
 using Application.Validators.UserValidators;
 using Domain.Models;
 using FluentValidation.TestHelper;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 using Moq;
 
 namespace Test.UserTests.ValidatorTests

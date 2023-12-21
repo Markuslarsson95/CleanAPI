@@ -1,7 +1,7 @@
 ﻿using Application.Dtos;
 using Domain.Models;
 using FluentValidation;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 
 namespace Application.Validators.UserValidators
 {

@@ -1,6 +1,6 @@
 ﻿using Application.Queries.Users.GetById;
 using Domain.Models;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 using Moq;
 
 namespace Test.UserTests.QueryTests

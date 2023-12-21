@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Password;
+using Infrastructure.Repositories.Users;
 using MediatR;
 
 namespace Application.Commands.Users.AddUser
@@ -8,10 +9,12 @@ namespace Application.Commands.Users.AddUser
     public sealed class AddUserCommandHandler : IRequestHandler<AddUserCommand, User>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPasswordEncryptor _passwordEncryptor;
 
-        public AddUserCommandHandler(IUserRepository userRepository)
+        public AddUserCommandHandler(IUserRepository userRepository, IPasswordEncryptor passwordEncryptor)
         {
             _userRepository = userRepository;
+            _passwordEncryptor = passwordEncryptor;
         }
 
         public async Task<User> Handle(AddUserCommand request, CancellationToken cancellationToken)
@@ -20,7 +23,7 @@ namespace Application.Commands.Users.AddUser
             {
                 Id = Guid.NewGuid(),
                 UserName = request.NewUser.UserName,
-                Password = request.NewUser.Password
+                Password = _passwordEncryptor.Encrypt(request.NewUser.Password)
             };
             List<Animal> animals = userToCreate.Animals ?? new List<Animal>();
 
