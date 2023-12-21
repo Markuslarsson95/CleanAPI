@@ -12,13 +12,13 @@ namespace Infrastructure.Repositories.Login
 {
     public class LoginRepository : ILoginRepository
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
         private readonly IConfiguration _configuration;
         private readonly IPasswordEncryptor _passwordEncryptor;
 
-        public LoginRepository(MySqlDB mySqlDb, IConfiguration configuration, IPasswordEncryptor passwordEncryptor)
+        public LoginRepository(SqlDbContext sqlDbContext, IConfiguration configuration, IPasswordEncryptor passwordEncryptor)
         {
-            _mySqlDb = mySqlDb;
+            _sqlDbContext = sqlDbContext;
             _configuration = configuration;
             _passwordEncryptor = passwordEncryptor;
         }
@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories.Login
             {
                 Log.Information($"Attempting login for user: {userName}");
 
-                var wantedUser = _mySqlDb.Users.FirstOrDefault(u => u.UserName == userName);
+                var wantedUser = _sqlDbContext.Users.FirstOrDefault(u => u.UserName == userName);
 
                 if (wantedUser == null || !_passwordEncryptor.Verify(password, wantedUser.Password))
                 {

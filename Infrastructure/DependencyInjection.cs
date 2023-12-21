@@ -23,7 +23,7 @@ namespace Infrastructure
             services.AddScoped<IPasswordEncryptor, PasswordEncryptor>();
             services.AddScoped(typeof(IAnimalRepository<>), typeof(AnimalRepository<>));
             services.AddSingleton<MockDatabase>();
-            services.AddDbContext<MySqlDB>();
+            services.AddDbContext<SqlDbContext>();
 
             return services;
         }

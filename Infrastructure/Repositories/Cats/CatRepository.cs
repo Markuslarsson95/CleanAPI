@@ -8,11 +8,11 @@ namespace Infrastructure.Repositories.Cats
 {
     public class CatRepository : ICatRepository
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
 
-        public CatRepository(MySqlDB mySqlDb)
+        public CatRepository(SqlDbContext sqlDbContext)
         {
-            _mySqlDb = mySqlDb;
+            _sqlDbContext = sqlDbContext;
         }
 
         public async Task<List<Cat>> GetAll(string? sortByBreed, int? sortByWeight)
@@ -21,7 +21,7 @@ namespace Infrastructure.Repositories.Cats
             {
                 Log.Information("Looking for Cats in database");
 
-                IQueryable<Cat> query = _mySqlDb.Cats.Include(x => x.Users).OrderBy(x => x.Name).ThenBy(x => x.Breed);
+                IQueryable<Cat> query = _sqlDbContext.Cats.Include(x => x.Users).OrderBy(x => x.Name).ThenBy(x => x.Breed);
 
                 if (!string.IsNullOrEmpty(sortByBreed))
                 {
@@ -51,7 +51,7 @@ namespace Infrastructure.Repositories.Cats
             {
                 Log.Information("Looking for Cat in database");
 
-                var cat = _mySqlDb.Cats
+                var cat = _sqlDbContext.Cats
                     .Include(x => x.Users)
                     .FirstOrDefault(x => x.Id == id);
 
@@ -70,8 +70,8 @@ namespace Infrastructure.Repositories.Cats
             {
                 Log.Information("Adding a new cat to the database");
 
-                _mySqlDb.Cats.Add(cat);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Cats.Add(cat);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully added a new cat to the database");
 
@@ -90,8 +90,8 @@ namespace Infrastructure.Repositories.Cats
             {
                 Log.Information("Updating cat in the database");
 
-                _mySqlDb.Cats.Update(cat);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Cats.Update(cat);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully updated cat in the database");
 
@@ -110,8 +110,8 @@ namespace Infrastructure.Repositories.Cats
             {
                 Log.Information("Removing cat from the database");
 
-                _mySqlDb.Cats.Remove(cat);
-                _mySqlDb.SaveChanges();
+                _sqlDbContext.Cats.Remove(cat);
+                _sqlDbContext.SaveChanges();
 
                 Log.Information("Successfully removed cat in the database");
                 return await Task.FromResult(cat);

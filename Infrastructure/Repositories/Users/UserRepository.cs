@@ -6,18 +6,18 @@ namespace Infrastructure.Repositories.Users
 {
     public class UserRepository : IUserRepository
     {
-        private readonly MySqlDB _mySqlDb;
+        private readonly SqlDbContext _sqlDbContext;
 
-        public UserRepository(MySqlDB mySqlDb)
+        public UserRepository(SqlDbContext sqlDbContext)
         {
-            _mySqlDb = mySqlDb;
+            _sqlDbContext = sqlDbContext;
         }
 
         public async Task<List<User>> GetAll()
         {
             try
             {
-                IQueryable<User> query = _mySqlDb.Users.Include(x => x.Animals).OrderBy(x => x.UserName);
+                IQueryable<User> query = _sqlDbContext.Users.Include(x => x.Animals).OrderBy(x => x.UserName);
 
                 var userList = await query.ToListAsync();
                 return userList;
@@ -30,7 +30,7 @@ namespace Infrastructure.Repositories.Users
 
         public async Task<User?> GetById(Guid id)
         {
-            var user = _mySqlDb.Users
+            var user = _sqlDbContext.Users
                 .Include(x => x.Animals)
                 .FirstOrDefault(x => x.Id == id);
             return await Task.FromResult(user);
@@ -38,22 +38,22 @@ namespace Infrastructure.Repositories.Users
 
         public async Task<User> Add(User user)
         {
-            _mySqlDb.Users.Add(user);
-            _mySqlDb.SaveChanges();
+            _sqlDbContext.Users.Add(user);
+            _sqlDbContext.SaveChanges();
             return await Task.FromResult(user);
         }
 
         public async Task<User> Update(User user)
         {
-            _mySqlDb.Users.Update(user);
-            _mySqlDb.SaveChanges();
+            _sqlDbContext.Users.Update(user);
+            _sqlDbContext.SaveChanges();
             return await Task.FromResult(user);
         }
 
         public async Task<User> Delete(User user)
         {
-            _mySqlDb.Users.Remove(user);
-            _mySqlDb.SaveChanges();
+            _sqlDbContext.Users.Remove(user);
+            _sqlDbContext.SaveChanges();
             return await Task.FromResult(user);
         }
     }

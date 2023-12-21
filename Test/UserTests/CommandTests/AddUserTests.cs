@@ -13,13 +13,13 @@ namespace Test.UserTests.CommandTests
     {
         private Mock<IUserRepository> _userRepositoryMock;
         private Mock<IPasswordEncryptor> _passwordEncryptorMock;
-        private Mock<MySqlDB> _mySqlDbMock = new Mock<MySqlDB>();
+        private Mock<SqlDbContext> _sqlDbContextMock = new Mock<SqlDbContext>();
         private AddUserCommandHandler _handler;
 
         [SetUp]
         public void Setup()
         {
-            _mySqlDbMock.Setup(x => x.Add(It.IsAny<User>()));
+            _sqlDbContextMock.Setup(x => x.Add(It.IsAny<User>()));
             _userRepositoryMock = new Mock<IUserRepository>();
             _passwordEncryptorMock = new Mock<IPasswordEncryptor>();
             _handler = new AddUserCommandHandler(_userRepositoryMock.Object, _passwordEncryptorMock.Object);
