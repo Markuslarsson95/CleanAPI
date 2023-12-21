@@ -1,21 +1,35 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Birds.GetAll
 {
     public class GetAllBirdsQueryHandler : IRequestHandler<GetAllBirdsQuery, List<Bird>>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IBirdRepository _birdRepository;
 
-        public GetAllBirdsQueryHandler(MockDatabase mockDatabase)
+        public GetAllBirdsQueryHandler(IBirdRepository birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
-        public Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
+        public async Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
         {
-            List<Bird> allBirdsFromMockDatabase = _mockDatabase.Birds;
-            return Task.FromResult(allBirdsFromMockDatabase);
+            try
+            {
+                Log.Information("Getting all birds from the repository");
+
+                var birdList = await _birdRepository.GetAll(request.SortyByColor);
+
+                Log.Information("Successfully retrieved bird list from the repository");
+
+                return birdList;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling GetAllBirdsQuery");
+                throw new Exception("Error occurred while handling GetAllBirdsQuery", ex);
+            }
         }
     }
 }

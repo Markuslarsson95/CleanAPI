@@ -1,36 +1,64 @@
 ﻿using Application.Queries.Dogs;
 using Application.Queries.Dogs.GetAll;
-using Domain.Models;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
+using Moq;
 
 namespace Test.DogTests.QueryTest
 {
     [TestFixture]
     public class GetAllDogsTests
     {
+        private Mock<IDogRepository> _dogRepositoryMock;
         private GetAllDogsQueryHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
-            // Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new GetAllDogsQueryHandler(_mockDatabase);
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _handler = new GetAllDogsQueryHandler(_dogRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_ValidList_ReturnsAllDogs()
+        public async Task Handle_Should_ReturnDogList()
         {
             // Arrange
-            List<Dog> dogs = _mockDatabase.Dogs;
+            var query = new GetAllDogsQuery(sortyByBreed: "Bulldog", 25);
+            var expectedDogs = new List<Dog>
+            {
+                new Dog { Id = Guid.NewGuid(), Breed = "Bulldog", Weight = 30, Name = "Boss" },
+                new Dog { Id = Guid.NewGuid(), Breed = "Bulldog", Weight = 25, Name = "Pluto" }
+            };
+            _dogRepositoryMock.Setup(x => x.GetAll("Bulldog", 25)).ReturnsAsync(expectedDogs);
 
             // Act
-            var result = await _handler.Handle(new GetAllDogsQuery(), CancellationToken.None);
+            var result = await _handler.Handle(query, default);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.That(result, Is.EqualTo(dogs));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(expectedDogs));
+            _dogRepositoryMock.Verify(x => x.GetAll("Bulldog", 25), Times.Once);
+        }
+
+        [Test]
+        public async Task Handle_Should_ReturnEmptyDogList_When_NoDogWithCorrectWeight()
+        {
+            // Arrange
+            var query = new GetAllDogsQuery(sortyByBreed: "Bulldog", 10);
+            var expectedDogs = new List<Dog>
+            {
+
+            };
+
+            _dogRepositoryMock.Setup(x => x.GetAll("Bulldog", 10)).ReturnsAsync(expectedDogs);
+
+            // Act
+            var result = await _handler.Handle(query, default);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+            Assert.That(result, Is.EqualTo(expectedDogs));
+            _dogRepositoryMock.Verify(x => x.GetAll("Bulldog", 10), Times.Once);
         }
     }
 }

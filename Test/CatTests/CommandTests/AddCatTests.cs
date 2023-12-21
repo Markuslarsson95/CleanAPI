@@ -1,36 +1,40 @@
 ﻿using Application.Commands.Cats;
 using Application.Dtos;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
+using Moq;
 
 namespace Test.CatTests.CommandTests
 {
     [TestFixture]
     public class AddCatTests
     {
+        private Mock<ICatRepository> _catRepositoryMock;
         private AddCatCommandHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new AddCatCommandHandler(_mockDatabase);
+            _catRepositoryMock = new Mock<ICatRepository>();
+            _handler = new AddCatCommandHandler(_catRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_AddNewValidCat_ReturnsNewCatList()
+        public async Task Handle_Should_AddNewCat_WhenValid()
         {
             // Arrange
-            var addCatCommand = new AddCatCommand(new CatDto { Name = "testNameCat", LikesToPlay = false });
+            var addCatCommand = new AddCatCommand(new CatDto { Name = "Test", LikesToPlay = true });
+
+            _catRepositoryMock.Setup(x => x.Add(
+                It.IsAny<Cat>()));
 
             // Act
-            var addedCat = await _handler.Handle(addCatCommand, CancellationToken.None);
-            var allCats = _mockDatabase.Cats;
+            var result = await _handler.Handle(addCatCommand, default);
 
             // Assert
-            Assert.NotNull(addedCat);
-            Assert.Contains(addedCat, allCats);
+            Assert.That(result, Is.Not.Null);
+            _catRepositoryMock.Verify(x => x.Add(It.Is<Cat>(d => d.Id == result.Id)), Times.Once);
         }
     }
 }

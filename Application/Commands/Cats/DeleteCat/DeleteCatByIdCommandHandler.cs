@@ -1,28 +1,42 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Cats
 {
     public class DeleteCatByIdCommandHandler : IRequestHandler<DeleteCatByIdCommand, Cat>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly ICatRepository _catRepository;
 
-        public DeleteCatByIdCommandHandler(MockDatabase mockDatabase)
+        public DeleteCatByIdCommandHandler(ICatRepository catRepository)
         {
-            _mockDatabase = mockDatabase;
+            _catRepository = catRepository;
         }
 
-        public Task<Cat> Handle(DeleteCatByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Cat> Handle(DeleteCatByIdCommand request, CancellationToken cancellationToken)
         {
-            Cat catToDelete = _mockDatabase.Cats.FirstOrDefault(cat => cat.Id == request.Id)!;
+            try
+            {
+                Log.Information($"Deleting cat with ID {request.Id}");
 
-            if (catToDelete == null)
-                return Task.FromResult<Cat>(null!);
+                var catToDelete = await _catRepository.GetById(request.Id);
 
-            _mockDatabase.Cats.Remove(catToDelete);
+                if (catToDelete == null)
+                {
+                    Log.Warning($"Cat with Id {request.Id} not found.");
+                    return await Task.FromResult<Cat>(null!);
+                }
 
-            return Task.FromResult(catToDelete);
+                await _catRepository.Delete(catToDelete);
+
+                return catToDelete;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An error occurred while handling DeleteCatByIdCommand for cat with ID {request.Id}");
+                throw new Exception($"Error occurred while handling DeleteCatByIdCommand for cat with ID {request.Id}", ex);
+            }
         }
     }
 }

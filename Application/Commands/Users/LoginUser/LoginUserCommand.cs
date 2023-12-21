@@ -1,16 +1,15 @@
 ﻿using Application.Dtos;
-using Domain.Models;
 using MediatR;
 
 namespace Application.Commands.Users.LoginUser
 {
     public sealed class LoginUserCommand : IRequest<string>
     {
-        public LoginUserCommand(UserDto dtoLogin)
+        public LoginUserCommand(LoginDto loginDto)
         {
-            UserLogin = dtoLogin;
+            UserLogin = loginDto;
         }
 
-        public UserDto UserLogin { get; }
+        public LoginDto UserLogin { get; }
     }
 }

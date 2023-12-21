@@ -1,47 +1,55 @@
 ﻿using Application.Queries.Cats.GetById;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
+using Moq;
 
 namespace Test.CatTests.QueryTest
 {
     [TestFixture]
     public class GetCatByIdTests
     {
+        private Mock<ICatRepository> _catRepositoryMock;
         private GetCatByIdQueryHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
             // Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new GetCatByIdQueryHandler(_mockDatabase);
+            _catRepositoryMock = new Mock<ICatRepository>();
+            _handler = new GetCatByIdQueryHandler(_catRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_ValidId_ReturnsCorrectCat()
+        public async Task Handle_Should_ReturnCat_WhenValidId()
         {
             // Arrange
-            var catId = new Guid("12345678-1234-5678-1234-372653665237");
+            var query = new GetCatByIdQuery(Guid.NewGuid());
+
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Cat { Id = Guid.NewGuid(), Name = "Cat", LikesToPlay = true });
 
             // Act
-            var result = await _handler.Handle(new GetCatByIdQuery(catId), CancellationToken.None);
+            var result = await _handler.Handle(query, default);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.That(result.Id, Is.EqualTo(catId));
+            Assert.That(result, Is.Not.Null);
+            _catRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
-        public async Task Handle_InvalidId_ReturnsNull()
+        public async Task Handle_Should_ReturnNull_WhenNotValidId()
         {
             // Arrange
-            var invalidCatId = Guid.NewGuid();
+            var query = new GetCatByIdQuery(Guid.NewGuid());
+
+            // Setup the mock to return null
+            _catRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Cat)null!);
 
             // Act
-            var result = await _handler.Handle(new GetCatByIdQuery(invalidCatId), CancellationToken.None);
+            var result = await _handler.Handle(query, default);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
+            _catRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
         }
     }
 }

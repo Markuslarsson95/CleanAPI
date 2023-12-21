@@ -1,29 +1,44 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Dogs
 {
     public class AddDogCommandHandler : IRequestHandler<AddDogCommand, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IDogRepository _dogRepository;
 
-        public AddDogCommandHandler(MockDatabase mockDatabase)
+        public AddDogCommandHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
+            _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(AddDogCommand request, CancellationToken cancellationToken)
         {
-            Dog dogToCreate = new()
+            try
             {
-                Id = Guid.NewGuid(),
-                Name = request.NewDog.Name
-            };
+                Log.Information("Creating a new dog");
 
-            _mockDatabase.Dogs.Add(dogToCreate);
+                Dog dogToCreate = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.NewDog.Name,
+                    Breed = request.NewDog.Breed,
+                    Weight = request.NewDog.Weight,
+                };
 
-            return Task.FromResult(dogToCreate);
+                await _dogRepository.Add(dogToCreate);
+
+                Log.Information("Successfully created a new dog");
+
+                return dogToCreate;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling AddDogCommand");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

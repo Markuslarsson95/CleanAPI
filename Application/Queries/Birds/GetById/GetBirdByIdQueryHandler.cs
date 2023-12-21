@@ -1,26 +1,34 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Birds
 {
-    public class GetBirdByIdQueryHandler : IRequestHandler<GetBirdByIdQuery, Bird>
+    public class GetBirdByIdQueryHandler : IRequestHandler<GetBirdByIdQuery, Bird?>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IBirdRepository _birdRepository;
 
-        public GetBirdByIdQueryHandler(MockDatabase mockDatabase)
+        public GetBirdByIdQueryHandler(IBirdRepository birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
 
-        public Task<Bird> Handle(GetBirdByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Bird?> Handle(GetBirdByIdQuery request, CancellationToken cancellationToken)
         {
-            Bird wantedBird = _mockDatabase.Birds.FirstOrDefault(bird => bird.Id == request.Id)!;
+            try
+            {
+                Log.Information($"Getting bird with ID {request.Id} from the repository");
 
-            if (wantedBird == null)
-                return Task.FromResult<Bird>(null!);
+                var wantedBird = await _birdRepository.GetById(request.Id);
 
-            return Task.FromResult(wantedBird);
+                return wantedBird;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An error occurred while handling GetBirdByIdQuery for ID {request.Id}");
+                throw new Exception($"Error occurred while handling GetBirdByIdQuery for ID {request.Id}", ex);
+            }
         }
     }
 }

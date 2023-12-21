@@ -1,35 +1,64 @@
 ﻿using Application.Queries.Cats.GetAll;
-using Domain.Models;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
+using Moq;
 
-namespace Test.CatTests.QueryTest
+namespace Test.catTests.QueryTest
 {
     [TestFixture]
     public class GetAllCatsTests
     {
+        private Mock<ICatRepository> _catRepositoryMock;
         private GetAllCatsQueryHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
-            // Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new GetAllCatsQueryHandler(_mockDatabase);
+            _catRepositoryMock = new Mock<ICatRepository>();
+            _handler = new GetAllCatsQueryHandler(_catRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_ValidList_ReturnsAllCats()
+        public async Task Handle_Should_ReturncatList()
         {
             // Arrange
-            List<Cat> cats = _mockDatabase.Cats;
+            var query = new GetAllCatsQuery(sortyByBreed: "Ragdoll", sortByWeight: 10);
+            var expectedCats = new List<Cat>
+            {
+                new Cat { Id = Guid.NewGuid(), Breed = "Ragdoll", Weight = 10, Name = "Cleo" },
+                new Cat { Id = Guid.NewGuid(), Breed = "Ragdoll", Weight = 11, Name = "Whiskers" }
+            };
+
+            _catRepositoryMock.Setup(x => x.GetAll("Ragdoll", 10)).ReturnsAsync(expectedCats);
 
             // Act
-            var result = await _handler.Handle(new GetAllCatsQuery(), CancellationToken.None);
+            var result = await _handler.Handle(query, default);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.That(result, Is.EqualTo(cats));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(expectedCats));
+            _catRepositoryMock.Verify(x => x.GetAll("Ragdoll", 10), Times.Once);
+        }
+
+        [Test]
+        public async Task Handle_Should_ReturnEmptyCatList_When_NoCatWithCorrectBreed()
+        {
+            // Arrange
+            var query = new GetAllCatsQuery(sortyByBreed: "NoBreed", 10);
+            var expectedCats = new List<Cat>
+            {
+
+            };
+
+            _catRepositoryMock.Setup(x => x.GetAll("NoBreed", 10)).ReturnsAsync(expectedCats);
+
+            // Act
+            var result = await _handler.Handle(query, default);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+            Assert.That(result, Is.EqualTo(expectedCats));
+            _catRepositoryMock.Verify(x => x.GetAll("NoBreed", 10), Times.Once);
         }
     }
 }

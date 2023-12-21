@@ -1,28 +1,42 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Dogs.DeleteDog
 {
     public class DeleteDogByIdCommandHandler : IRequestHandler<DeleteDogByIdCommand, Dog>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IDogRepository _dogRepository;
 
-        public DeleteDogByIdCommandHandler(MockDatabase mockDatabase)
+        public DeleteDogByIdCommandHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
+            _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Dog> Handle(DeleteDogByIdCommand request, CancellationToken cancellationToken)
         {
-            Dog dogToDelete = _mockDatabase.Dogs.FirstOrDefault(dog => dog.Id == request.Id)!;
+            try
+            {
+                var dogToDelete = await _dogRepository.GetById(request.Id);
 
-            if (dogToDelete == null)
-                return Task.FromResult<Dog>(null!);
+                if (dogToDelete == null)
+                {
+                    Log.Warning($"Dog with ID {request.Id} not found during deletion");
+                    return await Task.FromResult<Dog>(null!);
+                }
 
-            _mockDatabase.Dogs.Remove(dogToDelete);
+                await _dogRepository.Delete(dogToDelete);
 
-            return Task.FromResult(dogToDelete);
+                Log.Information($"Successfully deleted dog with ID {request.Id}");
+
+                return dogToDelete;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An error occurred while handling DeleteDogByIdCommand for dog with ID {request.Id}");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

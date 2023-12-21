@@ -1,26 +1,33 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Cats.GetById
 {
-    public class GetCatByIdQueryHandler : IRequestHandler<GetCatByIdQuery, Cat>
+    public class GetCatByIdQueryHandler : IRequestHandler<GetCatByIdQuery, Cat?>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly ICatRepository _catRepository;
 
-        public GetCatByIdQueryHandler(MockDatabase mockDatabase)
+        public GetCatByIdQueryHandler(ICatRepository catRepository)
         {
-            _mockDatabase = mockDatabase;
+            _catRepository = catRepository;
         }
 
-        public Task<Cat> Handle(GetCatByIdQuery request, CancellationToken cancellationToken)
+        public Task<Cat?> Handle(GetCatByIdQuery request, CancellationToken cancellationToken)
         {
-            Cat wantedCat = _mockDatabase.Cats.FirstOrDefault(cat => cat.Id == request.Id)!;
+            try
+            {
+                Log.Information("GetById in catRepository called");
+                var wantedCat = _catRepository.GetById(request.Id);
 
-            if (wantedCat == null)
-                return Task.FromResult<Cat>(null!);
-
-            return Task.FromResult(wantedCat);
+                return wantedCat;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred.");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

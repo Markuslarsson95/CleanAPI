@@ -1,36 +1,39 @@
 ﻿using Application.Commands.Dogs;
 using Application.Dtos;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
+using Moq;
 
 namespace Test.DogTests.CommandTests
 {
     [TestFixture]
     public class AddDogTests
     {
+        private Mock<IDogRepository> _dogRepositoryMock;
         private AddDogCommandHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
-            //Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new AddDogCommandHandler(_mockDatabase);
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _handler = new AddDogCommandHandler(_dogRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_AddNewValidDog_ReturnsNewDogList()
+        public async Task Handle_Should_AddNewDog_WhenValid()
         {
             // Arrange
-            var addDogCommand = new AddDogCommand(new DogDto { Name = "testNameDog" });
+            var addDogCommand = new AddDogCommand(new DogDto { Name = "Test" });
+
+            _dogRepositoryMock.Setup(x => x.Add(
+                It.IsAny<Dog>()));
 
             // Act
-            var addedDog = await _handler.Handle(addDogCommand, CancellationToken.None);
-            var allDogs = _mockDatabase.Dogs;
+            var result = await _handler.Handle(addDogCommand, default);
 
             // Assert
-            Assert.NotNull(addedDog);
-            Assert.Contains(addedDog, allDogs);
+            Assert.That(result, Is.Not.Null);
+            _dogRepositoryMock.Verify(x => x.Add(It.Is<Dog>(d => d.Id == result.Id)), Times.Once);
         }
     }
 }

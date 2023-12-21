@@ -1,36 +1,40 @@
 ﻿using Application.Commands.Birds;
 using Application.Dtos;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
+using Moq;
 
 namespace Test.BirdTests.CommandTests
 {
     [TestFixture]
     public class AddBirdTests
     {
+        private Mock<IBirdRepository> _birdRepositoryMock;
         private AddBirdCommandHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new AddBirdCommandHandler(_mockDatabase);
+            _birdRepositoryMock = new Mock<IBirdRepository>();
+            _handler = new AddBirdCommandHandler(_birdRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_AddNewValidBird_ReturnsNewBirdList()
+        public async Task Handle_Should_AddNewBird_WhenValid()
         {
             // Arrange
-            var addBirdCommand = new AddBirdCommand(new BirdDto { Name = "testNameBird", CanFly = true });
+            var addBirdCommand = new AddBirdCommand(new BirdDto { Name = "Test", CanFly = true });
+
+            _birdRepositoryMock.Setup(x => x.Add(
+                It.IsAny<Bird>()));
 
             // Act
-            var addedBird = await _handler.Handle(addBirdCommand, CancellationToken.None);
-            var allBirds = _mockDatabase.Birds;
+            var result = await _handler.Handle(addBirdCommand, default);
 
             // Assert
-            Assert.NotNull(addedBird);
-            Assert.Contains(addedBird, allBirds);
+            Assert.That(result, Is.Not.Null);
+            _birdRepositoryMock.Verify(x => x.Add(It.Is<Bird>(d => d.Id == result.Id)), Times.Once);
         }
     }
 }

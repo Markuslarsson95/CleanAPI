@@ -1,22 +1,36 @@
 ﻿using Application.Queries.Dogs.GetAll;
-using Domain.Models;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Dogs
 {
     public class GetAllDogsQueryHandler : IRequestHandler<GetAllDogsQuery, List<Dog>>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IDogRepository _dogRepository;
 
-        public GetAllDogsQueryHandler(MockDatabase mockDatabase)
+        public GetAllDogsQueryHandler(IDogRepository dogRepository)
         {
-            _mockDatabase = mockDatabase;
+            _dogRepository = dogRepository;
         }
         public Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            List<Dog> allDogsFromMockDatabase = _mockDatabase.Dogs;
-            return Task.FromResult(allDogsFromMockDatabase);
+            try
+            {
+                Log.Information("Fetching all dogs from the repository");
+
+                var dogList = _dogRepository.GetAll(request.SortyByBreed, request.SortByWeight);
+
+                Log.Information("Successfully retrieved all dogs from the repository");
+
+                return dogList;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while fetching all dogs from the repository");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

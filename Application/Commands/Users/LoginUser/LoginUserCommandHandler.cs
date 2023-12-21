@@ -1,68 +1,39 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Infrastructure.Repositories.Login;
 using MediatR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Serilog;
 
 namespace Application.Commands.Users.LoginUser
 {
     public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, string>
     {
-        private readonly MockDatabase _mockDatabase;
-        private readonly IConfiguration _configuration;
-        private const string Issuer = "https://localhost:7024";
-        private const string Audience = "https://localhost:7024";
+        private readonly ILoginRepository _loginRepository;
 
-        public LoginUserCommandHandler(MockDatabase mockDatabase, IConfiguration configuration)
+        public LoginUserCommandHandler(ILoginRepository loginRepository)
         {
-            _mockDatabase = mockDatabase;
-            _configuration = configuration;
+            _loginRepository = loginRepository;
         }
 
-        public Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var wantedUser = _mockDatabase.Users.FirstOrDefault(x => x.UserName == request.UserLogin.UserName);
-
-            if (wantedUser == null || wantedUser.Password != request.UserLogin.Password)
+            try
             {
-                return Task.FromResult<string>(null!);
+                Log.Information($"Logging in user: {request.UserLogin.UserName}");
+
+                var loginToken = await _loginRepository.Login(request.UserLogin.UserName, request.UserLogin.Password);
+
+                if (loginToken == null)
+                {
+                    Log.Warning($"Login failed for user: {request.UserLogin.UserName}");
+                    return await Task.FromResult<string>(null!);
+                }
+
+                return await Task.FromResult(loginToken);
             }
-
-            var token = CreateToken(wantedUser);
-
-            return Task.FromResult(token);
-        }
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>
-            { new Claim(ClaimTypes.Name, user.UserName) };
-
-            if (user.UserName == "Admin")
+            catch (Exception ex)
             {
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                Log.Error(ex, "An error occurred while processing user login");
+                throw new Exception("An error occurred while processing user login", ex);
             }
-            else
-                claims.Add(new Claim(ClaimTypes.Role, "User"));
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: Issuer,
-                audience: Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials
-                );
-
-            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwtToken;
         }
     }
 }

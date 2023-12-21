@@ -1,28 +1,43 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Birds
 {
     public class DeleteBirdByIdCommandHandler : IRequestHandler<DeleteBirdByIdCommand, Bird>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IBirdRepository _birdRepository;
 
-        public DeleteBirdByIdCommandHandler(MockDatabase mockDatabase)
+        public DeleteBirdByIdCommandHandler(IBirdRepository birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
 
-        public Task<Bird> Handle(DeleteBirdByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Bird> Handle(DeleteBirdByIdCommand request, CancellationToken cancellationToken)
         {
-            Bird birdToDelete = _mockDatabase.Birds.FirstOrDefault(bird => bird.Id == request.Id)!;
+            try
+            {
+                Log.Information($"Deleting bird with ID {request.Id}");
 
-            if (birdToDelete == null)
-                return Task.FromResult<Bird>(null!);
+                var birdToDelete = await _birdRepository.GetById(request.Id);
 
-            _mockDatabase.Birds.Remove(birdToDelete);
+                if (birdToDelete == null)
+                {
+                    return await Task.FromResult<Bird>(null!);
+                }
 
-            return Task.FromResult(birdToDelete);
+                await _birdRepository.Delete(birdToDelete);
+
+                Log.Information("Successfully removed bird from the repository");
+
+                return birdToDelete;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An error occurred while handling DeleteBirdByIdCommand for bird with ID {request.Id}");
+                throw new Exception($"Error occurred while handling DeleteBirdByIdCommand for bird with ID {request.Id}", ex);
+            }
         }
     }
 }

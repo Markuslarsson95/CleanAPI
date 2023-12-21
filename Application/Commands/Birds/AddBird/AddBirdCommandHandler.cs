@@ -1,30 +1,44 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Birds
 {
     public class AddBirdCommandHandler : IRequestHandler<AddBirdCommand, Bird>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly IBirdRepository _birdRepository;
 
-        public AddBirdCommandHandler(MockDatabase mockDatabase)
+        public AddBirdCommandHandler(IBirdRepository birdRepository)
         {
-            _mockDatabase = mockDatabase;
+            _birdRepository = birdRepository;
         }
 
-        public Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
+        public async Task<Bird> Handle(AddBirdCommand request, CancellationToken cancellationToken)
         {
-            Bird birdToCreate = new()
+            try
             {
-                Id = Guid.NewGuid(),
-                Name = request.NewBird.Name,
-                CanFly = request.NewBird.CanFly
-            };
+                Log.Information("Adding a new bird to the repository");
 
-            _mockDatabase.Birds.Add(birdToCreate);
+                Bird birdToCreate = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.NewBird.Name,
+                    CanFly = request.NewBird.CanFly,
+                    Color = request.NewBird.Color
+                };
 
-            return Task.FromResult(birdToCreate);
+                await _birdRepository.Add(birdToCreate);
+
+                Log.Information("Successfully added a new bird to the repository");
+
+                return birdToCreate;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling AddBirdCommand");
+                throw new Exception("Error occurred while handling AddBirdCommand", ex);
+            }
         }
     }
 }

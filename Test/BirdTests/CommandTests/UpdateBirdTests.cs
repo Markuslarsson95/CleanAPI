@@ -1,57 +1,59 @@
 ﻿using Application.Commands.Birds;
 using Application.Dtos;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Birds;
+using Moq;
 
 namespace Test.BirdTests.CommandTests
 {
     [TestFixture]
     public class UpdateBirdTests
     {
+        private Mock<IBirdRepository> _birdRepositoryMock;
         private UpdateBirdByIdCommandHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new UpdateBirdByIdCommandHandler(_mockDatabase);
+            _birdRepositoryMock = new Mock<IBirdRepository>();
+            _handler = new UpdateBirdByIdCommandHandler(_birdRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_UpdateBirdValidId_ReturnsUpdatedBirdList()
+        public async Task Handle_Should_UpdateBird_WhenIdIsValid()
         {
             // Arrange
-            var updateBirdComand = new UpdateBirdByIdCommand(new BirdDto()
-            {
-                Name = "TestUpdateBird",
-                CanFly = true
-            }, new Guid("12345678-1234-5678-1234-467580398558"));
+            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update", CanFly = true }, Guid.NewGuid());
+
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Bird { Id = Guid.NewGuid(), Name = "Update", CanFly = true });
+            _birdRepositoryMock.Setup(x => x.Update(It.IsAny<Bird>()));
 
             // Act
-            var updatedBird = await _handler.Handle(updateBirdComand, CancellationToken.None);
-            var birdListAfterUpdate = _mockDatabase.Birds;
+            var result = await _handler.Handle(command, default);
 
             // Assert
-            Assert.NotNull(updatedBird);
-            Assert.That(birdListAfterUpdate, Does.Contain(updatedBird));
+            Assert.That(result, Is.Not.Null);
+            _birdRepositoryMock.Verify(x => x.Update(It.Is<Bird>(d => d.Name == result.Name)), Times.Once);
+            _birdRepositoryMock.Verify(x => x.Update(It.Is<Bird>(d => d.Id == result.Id)), Times.Once);
         }
 
         [Test]
-        public async Task Handle_UpdateBirdInvalidId_ReturnsNullReferenceException()
+        public async Task Handle_Should_Not_UpdateBird_WhenIdIsNotValid()
         {
             // Arrange
-            var updateBirdCommand = new UpdateBirdByIdCommand(new BirdDto()
-            {
-                Name = "TestUpdateBird",
-                CanFly = true
-            }, Guid.NewGuid());
+            var command = new UpdateBirdByIdCommand(new BirdDto { Name = "Update", CanFly = false }, Guid.NewGuid());
+
+            _birdRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Bird)null!);
+            _birdRepositoryMock.Setup(x => x.Update(It.IsAny<Bird>()));
 
             // Act
-            var updatedBird = await _handler.Handle(updateBirdCommand, CancellationToken.None);
+            var result = await _handler.Handle(command, default);
 
             // Assert
-            Assert.IsNull(updatedBird);
+            Assert.That(result, Is.Null);
+            _birdRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
+            _birdRepositoryMock.Verify(x => x.Update(It.IsAny<Bird>()), Times.Never);
         }
     }
 }

@@ -1,30 +1,43 @@
-﻿using Domain.Models;
-using Infrastructure.Database;
+﻿using Domain.Models.Animals;
+using Infrastructure.Repositories.Cats;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Cats
 {
     public class AddCatCommandHandler : IRequestHandler<AddCatCommand, Cat>
     {
-        private readonly MockDatabase _mockDatabase;
+        private readonly ICatRepository _catRepository;
 
-        public AddCatCommandHandler(MockDatabase mockDatabase)
+        public AddCatCommandHandler(ICatRepository catRepository)
         {
-            _mockDatabase = mockDatabase;
+            _catRepository = catRepository;
         }
 
-        public Task<Cat> Handle(AddCatCommand request, CancellationToken cancellationToken)
+        public async Task<Cat> Handle(AddCatCommand request, CancellationToken cancellationToken)
         {
-            Cat catToCreate = new()
+            try
             {
-                Id = Guid.NewGuid(),
-                Name = request.NewCat.Name,
-                LikesToPlay = request.NewCat.LikesToPlay,
-            };
+                Log.Information("Creating a new cat");
 
-            _mockDatabase.Cats.Add(catToCreate);
+                Cat catToCreate = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.NewCat.Name,
+                    LikesToPlay = request.NewCat.LikesToPlay,
+                    Breed = request.NewCat.Breed,
+                    Weight = request.NewCat.Weight,
+                };
 
-            return Task.FromResult(catToCreate);
+                await _catRepository.Add(catToCreate);
+
+                return catToCreate;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling AddCatCommand");
+                throw new Exception("Error occurred while handling AddCatCommand", ex);
+            }
         }
     }
 }

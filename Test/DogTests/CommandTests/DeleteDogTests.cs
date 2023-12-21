@@ -1,48 +1,57 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
-using Infrastructure.Database;
+using Domain.Models.Animals;
+using Infrastructure.Repositories.Dogs;
+using Moq;
 
 namespace Test.DogTests.CommandTests
 {
     [TestFixture]
     public class DeleteDogTests
     {
+        private Mock<IDogRepository> _dogRepositoryMock;
         private DeleteDogByIdCommandHandler _handler;
-        private MockDatabase _mockDatabase;
 
         [SetUp]
         public void SetUp()
         {
             //Initialize the handler and mock database before each test
-            _mockDatabase = new MockDatabase();
-            _handler = new DeleteDogByIdCommandHandler(_mockDatabase);
+            _dogRepositoryMock = new Mock<IDogRepository>();
+            _handler = new DeleteDogByIdCommandHandler(_dogRepositoryMock.Object);
         }
 
         [Test]
-        public async Task Handle_DeleteDogValidId_RemovesDogFromList()
+        public async Task Handle_Should_DeleteDog_WhenIdIsValid()
         {
             // Arrange
-            var deleteDogCommand = new DeleteDogByIdCommand(new Guid("12345678-1234-5678-1234-573295756761"));
+            var command = new DeleteDogByIdCommand(Guid.NewGuid());
+
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync(new Dog { Id = Guid.NewGuid(), Name = "Test" });
+            _dogRepositoryMock.Setup(x => x.Delete(It.IsAny<Dog>()));
 
             // Act
-            var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
-            var dogListAfterDeletion = _mockDatabase.Dogs;
+            var result = await _handler.Handle(command, default);
 
             // Assert
-            Assert.NotNull(deletedDog);
-            Assert.That(dogListAfterDeletion, Does.Not.Contain(deletedDog));
+            Assert.That(result, Is.Not.Null);
+            _dogRepositoryMock.Verify(x => x.Delete(It.Is<Dog>(d => d.Id == result.Id)), Times.Once);
         }
 
         [Test]
-        public async Task Handle_DeleteDogInvalidId_ReturnsNull()
+        public async Task Handle_Should_Not_DeleteDog_WhenIdIsNotValid()
         {
             // Arrange
-            var deleteDogCommand = new DeleteDogByIdCommand(Guid.NewGuid());
+            var command = new DeleteDogByIdCommand(Guid.NewGuid());
+
+            _dogRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).ReturnsAsync((Dog)null!);
+            _dogRepositoryMock.Setup(x => x.Delete(It.IsAny<Dog>()));
 
             /// Act
-            var deletedDog = await _handler.Handle(deleteDogCommand, CancellationToken.None);
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.Null(deletedDog);
+            Assert.That(result, Is.Null);
+            _dogRepositoryMock.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Once);
+            _dogRepositoryMock.Verify(x => x.Delete(It.IsAny<Dog>()), Times.Never);
         }
     }
 }
