@@ -3,6 +3,6 @@
     public class AnimalUserDto
     {
         public Guid UserId { get; set; }
-        public Guid AnimalId { get; set; }
+        public List<Guid> AnimalId { get; set; }
     }
 }
