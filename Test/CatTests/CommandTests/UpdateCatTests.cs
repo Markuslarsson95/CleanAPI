@@ -1,7 +1,7 @@
 ﻿using Application.Commands.Cats;
 using Application.Dtos;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Cats;
 using Moq;
 
 namespace Test.CatTests.CommandTests

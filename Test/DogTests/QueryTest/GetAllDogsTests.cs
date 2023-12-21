@@ -1,7 +1,7 @@
 ﻿using Application.Queries.Dogs;
 using Application.Queries.Dogs.GetAll;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dogs;
 using Moq;
 
 namespace Test.DogTests.QueryTest

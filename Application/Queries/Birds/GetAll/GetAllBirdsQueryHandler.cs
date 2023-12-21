@@ -1,6 +1,7 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Birds;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Birds.GetAll
 {
@@ -12,11 +13,23 @@ namespace Application.Queries.Birds.GetAll
         {
             _birdRepository = birdRepository;
         }
-        public Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
+        public async Task<List<Bird>> Handle(GetAllBirdsQuery request, CancellationToken cancellationToken)
         {
-            var birdList = _birdRepository.GetAll(request.SortyByColor);
+            try
+            {
+                Log.Information("Getting all birds from the repository");
 
-            return birdList;
+                var birdList = await _birdRepository.GetAll(request.SortyByColor);
+
+                Log.Information("Successfully retrieved bird list from the repository");
+
+                return birdList;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while handling GetAllBirdsQuery");
+                throw new Exception("Error occurred while handling GetAllBirdsQuery", ex);
+            }
         }
     }
 }

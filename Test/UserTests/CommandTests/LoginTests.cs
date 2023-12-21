@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Users.LoginUser;
 using Application.Dtos;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Login;
 using Moq;
 
 namespace Test.UserTests.CommandTests

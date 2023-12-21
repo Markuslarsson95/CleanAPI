@@ -2,7 +2,7 @@
 using Infrastructure.RealDatabase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Repositories.Animals
 {
     public class AnimalRepository<T> : IAnimalRepository<T> where T : Animal
     {

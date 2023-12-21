@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Domain.Models.Animals;
 using Application.Validators.DogValidators;
+using Application.Exceptions;
+using Serilog;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -35,11 +37,15 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAllDogsQuery(sortByBreed, sortByWeight)));
+                var dogListResault = await _mediator.Send(new GetAllDogsQuery(sortByBreed, sortByWeight));
+
+                Log.Information("Dog List found: {@dogListResault}", dogListResault);
+                return Ok(dogListResault);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException ex)
             {
-                return BadRequest(e.Message);
+                Log.Error(ex, "An unexpected error occurred.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -55,13 +61,26 @@ namespace API.Controllers
                 var getDogResult = await _mediator.Send(new GetDogByIdQuery(dogId));
 
                 if (getDogResult == null)
-                    return NotFound($"Dog with ID {dogId} not found");
+                {
+                    Log.Warning($"Dog with Id {dogId} not found.");
 
+                    throw new EntityNotFoundException("Dog", dogId);
+                }
+
+                Log.Information("Dog found: {@getDogResult}", getDogResult);
                 return Ok(getDogResult);
             }
-            catch (ArgumentException e)
+            catch (EntityNotFoundException ex)
             {
-                return BadRequest(e.Message);
+                Log.Error(ex, $"Dog not found with Id {dogId}");
+
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred.");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
             }
         }
 
@@ -73,20 +92,32 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDog([FromBody] DogDto newDog)
         {
-            var validatorResult = _dogValidator.Validate(newDog);
-
-            if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage));
-            }
-
             try
             {
+                Log.Information("Validating DogDto");
+
+                var validatorResult = _dogValidator.Validate(newDog);
+
+                if (!validatorResult.IsValid)
+                {
+                    Log.Warning("Validation of DogDto failed");
+                    var validationErrors = validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage);
+                    throw new ValidationErrorException(newDog, validationErrors);
+                }
+
+                Log.Information("DogDto validation successful. Adding new dog: {@newDog}", newDog);
+
                 return Ok(await _mediator.Send(new AddDogCommand(newDog)));
             }
-            catch (ArgumentException e)
+            catch (ValidationErrorException ex)
             {
-                return BadRequest(e.Message);
+                Log.Error(ex, "Validation error when adding dog");
+                return BadRequest(ex.ValidationErrors);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred while processing AddDogCommand");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred");
             }
         }
 
@@ -99,23 +130,46 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateDogById([FromBody] DogDto updatedDog, Guid dogId)
         {
-            var validatorResult = _dogValidator.Validate(updatedDog);
-
-            if (!validatorResult.IsValid)
-                return ValidationProblem(validatorResult.ToString());
-
             try
             {
+                Log.Information($"Updating dog with ID {dogId}");
+
+                var validatorResult = _dogValidator.Validate(updatedDog);
+
+                if (!validatorResult.IsValid)
+                {
+                    Log.Warning("Validation of DogDto failed");
+                    var validationErrors = validatorResult.Errors.ConvertAll(errors => errors.ErrorMessage);
+                    throw new ValidationErrorException(updatedDog, validationErrors);
+                }
+
                 var updatedDogResult = await _mediator.Send(new UpdateDogByIdCommand(updatedDog, dogId));
 
                 if (updatedDogResult == null)
-                    return NotFound($"Dog with ID {dogId} not found");
+                {
+                    Log.Warning("No dog found to update");
 
+                    throw new EntityNotFoundException("Dog", dogId);
+                }
+
+                Log.Information("Successfully updated dog, updated dog: {@updatedDogResult}", updatedDogResult);
                 return Ok(updatedDogResult);
             }
-            catch (ArgumentException e)
+            catch (EntityNotFoundException ex)
             {
-                return BadRequest(e.Message);
+                Log.Error(ex, $"Dog not found with Id {dogId} during update");
+
+                return NotFound(ex.Message);
+            }
+            catch (ValidationErrorException ex)
+            {
+                Log.Error(ex, "Validation error when updating dog");
+                return BadRequest(ex.ValidationErrors);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"An unexpected error occurred while updating dog with ID {dogId}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred");
             }
         }
 
@@ -129,16 +183,30 @@ namespace API.Controllers
         {
             try
             {
+                Log.Information($"Deleting dog with ID {dogId}");
                 var dogToDelete = await _mediator.Send(new DeleteDogByIdCommand(dogId));
 
                 if (dogToDelete == null)
-                    return NotFound($"Dog with ID {dogId} not found");
+                {
+                    Log.Warning("No dog found to remove");
 
+                    throw new EntityNotFoundException("Dog", dogId);
+                }
+
+                Log.Information("Successfully removed dog, removed dog: {@dogToDelete}", dogToDelete);
                 return Ok(dogToDelete);
             }
-            catch (ArgumentException e)
+            catch (EntityNotFoundException ex)
             {
-                return BadRequest(e.Message);
+                Log.Error(ex, $"Dog not found with Id {dogId} during remove");
+
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred.");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
             }
         }
     }

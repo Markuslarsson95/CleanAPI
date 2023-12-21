@@ -1,7 +1,8 @@
 ﻿using Application.Queries.Dogs.GetAll;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dogs;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Dogs
 {
@@ -15,9 +16,21 @@ namespace Application.Queries.Dogs
         }
         public Task<List<Dog>> Handle(GetAllDogsQuery request, CancellationToken cancellationToken)
         {
-            var dogList = _dogRepository.GetAll(request.SortyByBreed, request.SortByWeight);
+            try
+            {
+                Log.Information("Fetching all dogs from the repository");
 
-            return dogList;
+                var dogList = _dogRepository.GetAll(request.SortyByBreed, request.SortByWeight);
+
+                Log.Information("Successfully retrieved all dogs from the repository");
+
+                return dogList;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while fetching all dogs from the repository");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

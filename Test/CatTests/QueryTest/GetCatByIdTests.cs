@@ -1,6 +1,6 @@
 ﻿using Application.Queries.Cats.GetById;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Cats;
 using Moq;
 
 namespace Test.CatTests.QueryTest

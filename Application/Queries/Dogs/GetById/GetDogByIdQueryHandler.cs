@@ -1,10 +1,11 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dogs;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Dogs.GetById
 {
-    public class GetDogByIdQueryHandler : IRequestHandler<GetDogByIdQuery, Dog>
+    public class GetDogByIdQueryHandler : IRequestHandler<GetDogByIdQuery, Dog?>
     {
         private readonly IDogRepository _dogRepository;
 
@@ -13,14 +14,20 @@ namespace Application.Queries.Dogs.GetById
             _dogRepository = dogRepository;
         }
 
-        public Task<Dog> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
+        public Task<Dog?> Handle(GetDogByIdQuery request, CancellationToken cancellationToken)
         {
-            var wantedDog = _dogRepository.GetById(request.Id);
+            try
+            {
+                Log.Information("GetById in dogRepository called");
+                var wantedDog = _dogRepository.GetById(request.Id);
 
-            if (wantedDog == null)
-                return Task.FromResult<Dog>(null!);
-
-            return wantedDog;
+                return wantedDog;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred.");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

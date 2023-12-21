@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Dogs.DeleteDog;
 using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dogs;
 using Moq;
 
 namespace Test.DogTests.CommandTests

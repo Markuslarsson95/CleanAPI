@@ -1,6 +1,6 @@
 ﻿using Domain.Models.Animals;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Repositories.Cats
 {
     public interface ICatRepository
     {

@@ -2,7 +2,7 @@
 using Infrastructure.RealDatabase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Repositories.Users
 {
     public class UserRepository : IUserRepository
     {

@@ -1,5 +1,6 @@
-﻿using Infrastructure.Repositories;
+﻿using Infrastructure.Repositories.Login;
 using MediatR;
+using Serilog;
 
 namespace Application.Commands.Users.LoginUser
 {
@@ -14,12 +15,25 @@ namespace Application.Commands.Users.LoginUser
 
         public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var loginToken = await _loginRepository.Login(request.UserLogin.UserName, request.UserLogin.Password);
+            try
+            {
+                Log.Information($"Logging in user: {request.UserLogin.UserName}");
 
-            if (loginToken == null)
-                return await Task.FromResult<string>(null!);
+                var loginToken = await _loginRepository.Login(request.UserLogin.UserName, request.UserLogin.Password);
 
-            return await Task.FromResult(loginToken);
+                if (loginToken == null)
+                {
+                    Log.Warning($"Login failed for user: {request.UserLogin.UserName}");
+                    return await Task.FromResult<string>(null!);
+                }
+
+                return await Task.FromResult(loginToken);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while processing user login");
+                throw new Exception("An error occurred while processing user login", ex);
+            }
         }
     }
 }

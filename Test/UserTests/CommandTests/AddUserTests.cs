@@ -2,7 +2,8 @@
 using Application.Dtos;
 using Domain.Models;
 using Infrastructure.RealDatabase;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Password;
+using Infrastructure.Repositories.Users;
 using Moq;
 
 namespace Test.UserTests.CommandTests
@@ -11,6 +12,7 @@ namespace Test.UserTests.CommandTests
     public class AddUserTests
     {
         private Mock<IUserRepository> _userRepositoryMock;
+        private Mock<IPasswordEncryptor> _passwordEncryptorMock;
         private Mock<MySqlDB> _mySqlDbMock = new Mock<MySqlDB>();
         private AddUserCommandHandler _handler;
 
@@ -19,7 +21,8 @@ namespace Test.UserTests.CommandTests
         {
             _mySqlDbMock.Setup(x => x.Add(It.IsAny<User>()));
             _userRepositoryMock = new Mock<IUserRepository>();
-            _handler = new AddUserCommandHandler(_userRepositoryMock.Object);
+            _passwordEncryptorMock = new Mock<IPasswordEncryptor>();
+            _handler = new AddUserCommandHandler(_userRepositoryMock.Object, _passwordEncryptorMock.Object);
         }
 
         [Test]

@@ -1,9 +1,10 @@
 ﻿using Application.Commands.Users.RemoveAnimalFromUser;
 using Domain.Models.Animals;
 using Domain.Models;
-using Infrastructure.Repositories;
 using Moq;
 using Application.Dtos;
+using Infrastructure.Repositories.Users;
+using Infrastructure.Repositories.Animals;
 
 namespace Test.UserTests.CommandTests
 {

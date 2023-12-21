@@ -1,9 +1,9 @@
 ﻿using Application.Queries.Users.GetAll;
 using Application.Queries.Users;
 using Domain.Models;
-using Infrastructure.Repositories;
 using Moq;
 using Domain.Models.Animals;
+using Infrastructure.Repositories.Users;
 
 namespace Test.UserTests.QueryTests
 {

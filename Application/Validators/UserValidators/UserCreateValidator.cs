@@ -1,7 +1,10 @@
 ﻿using Application.Dtos;
+using Application.Validators.BirdValidators;
+using Application.Validators.CatValidators;
+using Application.Validators.DogValidators;
 using Domain.Models;
 using FluentValidation;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 
 namespace Application.Validators.UserValidators
 {
@@ -19,6 +22,9 @@ namespace Application.Validators.UserValidators
             .Must(BeUniqueUsername).WithMessage("Username is already taken.");
             RuleFor(x => x.Password).NotEmpty().WithMessage("Password can not be empty or null")
                 .MinimumLength(5).WithMessage("Password must be at least five characters long");
+            RuleForEach(x => x.Dogs).SetValidator(new DogValidator());
+            RuleForEach(x => x.Cats).SetValidator(new CatValidator());
+            RuleForEach(x => x.Birds).SetValidator(new BirdValidator());
         }
 
         public bool BeUniqueUsername(string username)

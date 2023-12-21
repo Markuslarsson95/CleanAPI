@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Users.DeleteUser;
 using Domain.Models;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 using Moq;
 
 namespace Test.UserTests.CommandTests

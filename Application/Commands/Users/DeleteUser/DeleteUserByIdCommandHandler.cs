@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Users;
 using MediatR;
 
 namespace Application.Commands.Users.DeleteUser

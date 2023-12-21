@@ -1,6 +1,6 @@
 ﻿using Domain.Models.Animals;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Repositories.Animals
 {
     public interface IAnimalRepository<T> where T : Animal
     {

@@ -1,6 +1,7 @@
 ﻿using Domain.Models.Animals;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Cats;
 using MediatR;
+using Serilog;
 
 namespace Application.Queries.Cats.GetById
 {
@@ -15,12 +16,18 @@ namespace Application.Queries.Cats.GetById
 
         public Task<Cat?> Handle(GetCatByIdQuery request, CancellationToken cancellationToken)
         {
-            var wantedCat = _catRepository.GetById(request.Id);
+            try
+            {
+                Log.Information("GetById in catRepository called");
+                var wantedCat = _catRepository.GetById(request.Id);
 
-            if (wantedCat == null)
-                return Task.FromResult<Cat?>(null!);
-
-            return wantedCat;
+                return wantedCat;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An unexpected error occurred.");
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

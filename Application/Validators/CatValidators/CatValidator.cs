@@ -7,12 +7,14 @@ namespace Application.Validators.CatValidators
     {
         public CatValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name can not be empty or null")
-                .MinimumLength(2).WithMessage("Name must be at least two characters long")
-                .MaximumLength(30).WithMessage("Name can not be more than 30 characters long");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Cat name can not be empty or null")
+                .MinimumLength(2).WithMessage("Cat name must be at least two characters long")
+                .MaximumLength(30).WithMessage("Cat name can not be more than 30 characters long");
             RuleFor(x => x.LikesToPlay).NotNull().WithMessage("LikesToPlay must be true or false");
-            RuleFor(x => x.Breed).NotEmpty().WithMessage("Breed can not be empty or null");
-            RuleFor(x => x.Weight).NotEmpty().WithMessage("Weight can not be empty or null").GreaterThan(0).WithMessage("Weight must be higher than 0");
+            RuleFor(x => x.Breed)
+                .NotEmpty().WithMessage("Cat breed can not be empty or null")
+                .MaximumLength(30).WithMessage("Cat breed must not exceed 30 charachters");
+            RuleFor(x => x.Weight).GreaterThan(0).WithMessage("Cat weight must be higher than 0");
         }
     }
 }
