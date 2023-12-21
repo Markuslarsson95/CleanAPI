@@ -10,7 +10,10 @@ namespace Application.Validators
             RuleFor(x => x.UserId)
                 .SetValidator(new GuidValidator());
             RuleFor(x => x.AnimalId)
-                .SetValidator(new GuidValidator());
+                .ForEach(animalId =>
+                {
+                    animalId.SetValidator(new GuidValidator());
+                });
         }
     }
 }

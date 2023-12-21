@@ -21,7 +21,7 @@ namespace Application.Commands.Users.RemoveAnimalFromUser
         {
             try
             {
-                Log.Information($"Removing animal from user - UserId: {request.RemoveAnimalFromUser.UserId}, AnimalId: {request.RemoveAnimalFromUser.AnimalId}");
+                Log.Information($"Removing animals from user - UserId: {request.RemoveAnimalFromUser.UserId}, AnimalIds: {string.Join(", ", request.RemoveAnimalFromUser.AnimalId)}");
 
                 var user = await _userRepository.GetById(request.RemoveAnimalFromUser.UserId);
 
@@ -31,17 +31,17 @@ namespace Application.Commands.Users.RemoveAnimalFromUser
                     return await Task.FromResult<User>(null!);
                 }
 
-                var animal = await _animalRepository.GetAnimalById(request.RemoveAnimalFromUser.AnimalId);
-                if (animal == null)
+                var animalsToRemove = await _animalRepository.GetAnimalsByIds(request.RemoveAnimalFromUser.AnimalId);
+                if (animalsToRemove.Count != request.RemoveAnimalFromUser.AnimalId.Count)
                 {
-                    Log.Warning($"Animal with AnimalId {request.RemoveAnimalFromUser.AnimalId} not found.");
+                    Log.Warning($"One or more animals not found.");
                     return await Task.FromResult<User>(null!);
                 }
 
-                user.Animals.Remove(animal);
+                user.Animals.RemoveAll(animal => animalsToRemove.Contains(animal));
                 await _userRepository.Update(user);
 
-                Log.Information($"Removed animal from user successfully - UserId: {request.RemoveAnimalFromUser.UserId}, AnimalId: {request.RemoveAnimalFromUser.AnimalId}");
+                Log.Information($"Removed animals from user successfully - UserId: {request.RemoveAnimalFromUser.UserId}, AnimalIds: {string.Join(", ", request.RemoveAnimalFromUser.AnimalId)}");
 
                 return user;
             }

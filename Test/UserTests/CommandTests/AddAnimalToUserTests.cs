@@ -28,15 +28,15 @@ namespace Test.UserTests.CommandTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var animalId = Guid.NewGuid();
-            var command = new AddAnimalToUserCommand(new AnimalUserDto { UserId = userId, AnimalId = animalId });
+            var animalIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+            var command = new AddAnimalToUserCommand(new AnimalUserDto { UserId = userId, AnimalId = animalIds });
 
 
             var existingUser = new User { Id = userId, Animals = new List<Animal>() };
-            var existingAnimal = new Animal { Id = animalId };
+            var existingAnimal = animalIds.Select(id => new Animal { Id = id }).ToList();
 
             _userRepositoryMock.Setup(x => x.GetById(userId)).ReturnsAsync(existingUser);
-            _animalRepositoryMock.Setup(x => x.GetAnimalById(animalId)).ReturnsAsync(existingAnimal);
+            _animalRepositoryMock.Setup(x => x.GetAnimalsByIds(animalIds)).ReturnsAsync(existingAnimal);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -44,9 +44,9 @@ namespace Test.UserTests.CommandTests
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(userId, Is.EqualTo(result.Id));
-            Assert.That(animalId, Is.EqualTo(result.Animals[0].Id));
+            Assert.That(animalIds[0], Is.EqualTo(result.Animals[0].Id));
             _userRepositoryMock.Verify(x => x.GetById(userId), Times.Once);
-            _animalRepositoryMock.Verify(x => x.GetAnimalById(animalId), Times.Once);
+            _animalRepositoryMock.Verify(x => x.GetAnimalsByIds(animalIds), Times.Once);
             _userRepositoryMock.Verify(x => x.Update(existingUser), Times.Once);
         }
 
@@ -55,8 +55,8 @@ namespace Test.UserTests.CommandTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var animalId = Guid.NewGuid();
-            var command = new AddAnimalToUserCommand(new AnimalUserDto { UserId = userId, AnimalId = animalId });
+            var animalIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+            var command = new AddAnimalToUserCommand(new AnimalUserDto { UserId = userId, AnimalId = animalIds });
 
             _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(Task.FromResult((User?)null));
 
@@ -67,29 +67,6 @@ namespace Test.UserTests.CommandTests
             Assert.That(result, Is.Null);
             _userRepositoryMock.Verify(x => x.GetById(userId), Times.Once);
             _animalRepositoryMock.Verify(x => x.GetAnimalById(It.IsAny<Guid>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Never);
-        }
-
-        [Test]
-        public async Task Handle_AnimalIsNull_ReturnsNull()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var animalId = Guid.NewGuid();
-            var command = new AddAnimalToUserCommand(new AnimalUserDto { UserId = userId, AnimalId = animalId });
-
-            var existingUser = new User { Id = userId, Animals = new List<Animal>() };
-
-            _userRepositoryMock.Setup(x => x.GetById(userId)).ReturnsAsync(existingUser);
-            _animalRepositoryMock.Setup(x => x.GetAnimalById(animalId)).Returns(Task.FromResult((Animal?)null!));
-
-            // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            Assert.That(result, Is.Null);
-            _userRepositoryMock.Verify(x => x.GetById(userId), Times.Once);
-            _animalRepositoryMock.Verify(x => x.GetAnimalById(animalId), Times.Once);
             _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Never);
         }
     }

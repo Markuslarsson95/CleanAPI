@@ -21,7 +21,7 @@ namespace Application.Commands.Users.AddAnimalToUser
         {
             try
             {
-                Log.Information($"Adding animal to user - UserId: {request.AnimalToUser.UserId}, AnimalId: {request.AnimalToUser.AnimalId}");
+                Log.Information($"Adding animals to user - UserId: {request.AnimalToUser.UserId}, AnimalIds: {string.Join(", ", request.AnimalToUser.AnimalId)}");
 
                 var user = await _userRepository.GetById(request.AnimalToUser.UserId);
 
@@ -31,17 +31,17 @@ namespace Application.Commands.Users.AddAnimalToUser
                     return await Task.FromResult<User>(null!);
                 }
 
-                var animal = await _animalRepository.GetAnimalById(request.AnimalToUser.AnimalId);
-                if (animal == null)
+                var animalsToAdd = await _animalRepository.GetAnimalsByIds(request.AnimalToUser.AnimalId);
+                if (animalsToAdd.Count != request.AnimalToUser.AnimalId.Count)
                 {
-                    Log.Warning($"Animal with AnimalId {request.AnimalToUser.AnimalId} not found.");
+                    Log.Warning($"One or more animals not found.");
                     return await Task.FromResult<User>(null!);
                 }
 
-                user.Animals.Add(animal);
+                user.Animals.AddRange(animalsToAdd);
                 await _userRepository.Update(user);
 
-                Log.Information($"Added animal to user successfully - UserId: {request.AnimalToUser.UserId}, AnimalId: {request.AnimalToUser.AnimalId}");
+                Log.Information($"Added animals to user successfully - UserId: {request.AnimalToUser.UserId}, AnimalIds: {string.Join(", ", request.AnimalToUser.AnimalId)}");
 
                 return user;
             }
